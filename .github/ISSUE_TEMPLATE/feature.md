@@ -1,6 +1,6 @@
 ---
-name: " :white_check_mark: Feature"
-about: 작업 사항
+name: Feature
+about: 기능 개발 사항 입력
 title: ''
 labels: ''
 assignees: mgunho18
