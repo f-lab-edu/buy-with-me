@@ -2,7 +2,7 @@
 name: Feature
 about: 기능 개발 사항 입력
 title: ''
-labels: ''
+labels: enhancement
 assignees: mgunho18
 
 ---
