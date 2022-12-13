@@ -3,6 +3,7 @@ package com.flab.buywithme.controller;
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.service.MemberService;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +26,7 @@ public class MemberController {
 
     @ResponseBody
     @PostMapping("/members/new")
-    public String create(MemberForm form, BindingResult result) {
+    public String create(@Valid MemberForm form, BindingResult result) {
 
         if(result.hasErrors()) {
             return "/members/createMemberForm";
