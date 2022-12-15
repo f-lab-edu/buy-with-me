@@ -1,12 +1,13 @@
-package com.flab.buywithme.controller;
+package com.flab.buywithme.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
-public class MemberForm {
+@Getter
+@Setter
+public class MemberSignUpDTO {
 
     @NotBlank(message = "이름은 필수 값입니다")
     @Size(max = 10)

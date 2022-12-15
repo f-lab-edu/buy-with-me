@@ -2,43 +2,38 @@ package com.flab.buywithme.controller;
 
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.dto.MemberSignUpDTO;
 import com.flab.buywithme.service.MemberService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/members/new")
-    public String createForm(Model model) {
-        model.addAttribute("memberForm", new MemberForm());
-        return "/members/createMemberForm";
-    }
+    @PostMapping("/signup")
+    public void create(@Valid @RequestBody MemberSignUpDTO signUpDto, BindingResult result) {
 
-    @ResponseBody
-    @PostMapping("/members/new")
-    public String create(@Valid MemberForm form, BindingResult result) {
-
-        if(result.hasErrors()) {
-            return "/members/createMemberForm";
+        if (result.hasErrors()) {
+            throw new IllegalStateException("올바르지 않은 입력입니다");
         }
 
-        Address address = new Address(form.getDepth1(), form.getDepth2(), form.getDepth3());
+        Address address = new Address(signUpDto.getDepth1(), signUpDto.getDepth2(),
+                signUpDto.getDepth3());
 
-        Member member = new Member(address, form.getName(), form.getPhoneNo(), form.getLoginId(),
-                form.getPassword());
+        Member member = new Member(address, signUpDto.getName(), signUpDto.getPhoneNo(),
+                signUpDto.getLoginId(),
+                signUpDto.getPassword());
 
         memberService.join(member);
-        return "ok";
     }
 
 }
