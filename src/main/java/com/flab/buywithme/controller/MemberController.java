@@ -19,7 +19,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/signup")
+    @PostMapping
     public void signUp(@Valid @RequestBody MemberSignUpDTO signUpDto, BindingResult result) {
 
         if (result.hasErrors()) {
