@@ -20,7 +20,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public void create(@Valid @RequestBody MemberSignUpDTO signUpDto, BindingResult result) {
+    public void signUp(@Valid @RequestBody MemberSignUpDTO signUpDto, BindingResult result) {
 
         if (result.hasErrors()) {
             throw new IllegalStateException("올바르지 않은 입력입니다");
