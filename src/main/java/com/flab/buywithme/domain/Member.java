@@ -23,7 +23,7 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
     private Address address;
 
