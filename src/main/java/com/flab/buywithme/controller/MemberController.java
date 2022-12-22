@@ -33,7 +33,7 @@ public class MemberController {
                 signUpDto.getLoginId(),
                 signUpDto.getPassword());
 
-        memberService.join(member);
+        memberService.createMember(member);
     }
 
 }

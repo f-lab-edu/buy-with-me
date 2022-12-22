@@ -15,7 +15,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long join(Member member) {
+    public Long createMember(Member member) {
         checkDuplicateMemberExists(member);
         memberRepository.save(member);
         return member.getId();
