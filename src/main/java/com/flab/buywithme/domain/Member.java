@@ -43,4 +43,8 @@ public class Member {
         this.loginId = loginId;
         this.password = password;
     }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 }
