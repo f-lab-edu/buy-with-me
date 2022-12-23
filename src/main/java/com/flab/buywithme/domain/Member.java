@@ -2,6 +2,7 @@ package com.flab.buywithme.domain;
 
 import static javax.persistence.FetchType.LAZY;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,6 +43,11 @@ public class Member {
         this.phoneNo = phoneNo;
         this.loginId = loginId;
         this.password = password;
+    }
+
+    @VisibleForTesting
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setAddress(Address address) {
