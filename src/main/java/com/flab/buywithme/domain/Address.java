@@ -1,5 +1,6 @@
 package com.flab.buywithme.domain;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,5 +33,10 @@ public class Address {
         this.depth1 = depth1;
         this.depth2 = depth2;
         this.depth3 = depth3;
+    }
+
+    @VisibleForTesting
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -37,7 +37,7 @@ public class MemberService {
         return memberRepository.findById(memberId);
     }
 
-    public Optional<Address> checkDuplicateAddressExists(Address address) {
+    private Optional<Address> checkDuplicateAddressExists(Address address) {
         return addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
                 address.getDepth2(), address.getDepth3());
     }

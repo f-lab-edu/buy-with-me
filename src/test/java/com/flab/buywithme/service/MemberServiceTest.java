@@ -1,8 +1,9 @@
 package com.flab.buywithme.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import com.flab.buywithme.domain.Address;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -30,55 +30,63 @@ public class MemberServiceTest {
     private AddressRepository addressRepository;
 
     @Test
-    @DisplayName("회원가입 성공")
-    public void signupSuccess() {
-        //given
-        Member member = fakeMember(1L);
-
-        //mocking
-        given(memberRepository.save(any(Member.class)))
-                .willReturn(member);
-        given(memberRepository.findById(member.getId()))
-                .willReturn(Optional.ofNullable(member));
-
-        //when
-        Long saveId = memberService.createMember(member);
-
-        //then
-        assertEquals(member, memberService.findById(saveId).orElse(null));
-    }
-
-    @Test
-    @DisplayName("이미 존재하는 LoginId로 회원 가입 시도할 때 실패")
+    @DisplayName("loginId 중복 시 예외 발생")
     public void existingLoginIdFail() {
         //given
         Member member = fakeMember(1L);
 
         //mocking
         given(memberRepository.findByLoginId(member.getLoginId()))
-                .willReturn(Optional.ofNullable(member));
+                .willThrow(IllegalStateException.class);
 
         //when, then
         assertThrows(IllegalStateException.class, () -> memberService.createMember(member));
+
     }
 
     @Test
-    @DisplayName("동일 LoginId로 중복 회원 가입 시도할 때 실패")
-    public void duplicateSignupFail() {
+    @DisplayName("회원가입 성공")
+    public void signUpSuccess() {
         //given
-        Member member1 = fakeMember(1L);
-        Member member2 = fakeMember(2L);
+        Member member = fakeMember(1L);
+        Address address = member.getAddress();
 
         //mocking
-        given(memberRepository.save(any(Member.class)))
-                .willReturn(member1)
-                .willThrow(DataIntegrityViolationException.class);
+        given(memberRepository.findByLoginId(member.getLoginId()))
+                .willReturn(Optional.empty());
+        given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
+                address.getDepth2(), address.getDepth3()))
+                .willReturn(Optional.empty());
 
-        //when, then
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            memberService.createMember(member1);
-            memberService.createMember(member2);
-        });
+        //when
+        Long saveId = memberService.createMember(member);
+
+        //then
+        assertEquals(member.getId(), saveId);
+        assertNull(member.getAddress().getId());
+    }
+
+    @Test
+    @DisplayName("회원가입 시 기존에 address table에 존재하는 주소 조회 성공")
+    public void addressLookupSuccess() {
+        //given
+        Member member = fakeMember(1L);
+        Address address = member.getAddress();
+        Address existingAddress = fakeAddress(1L);
+
+        //mocking
+        given(memberRepository.findByLoginId(member.getLoginId()))
+                .willReturn(Optional.empty());
+        given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
+                address.getDepth2(), address.getDepth3()))
+                .willReturn(Optional.of(existingAddress));
+
+        //when
+        Long saveId = memberService.createMember(member);
+
+        //then
+        assertEquals(member.getId(), saveId);
+        assertNotNull(member.getAddress().getId());
     }
 
     private Member fakeMember(Long memberId) {
@@ -86,6 +94,12 @@ public class MemberServiceTest {
                 "test", "test1");
         member.setId(memberId);
         return member;
+    }
+
+    private Address fakeAddress(Long addressId) {
+        Address address = new Address("성남시", "분당구", "판교동");
+        address.setId(addressId);
+        return address;
     }
 
 }
