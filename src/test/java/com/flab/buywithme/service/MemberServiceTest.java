@@ -35,9 +35,8 @@ public class MemberServiceTest {
         //given
         Member member = fakeMember(1L);
 
-        //mocking
         given(memberRepository.findByLoginId(member.getLoginId()))
-                .willThrow(IllegalStateException.class);
+                .willReturn(Optional.of(member));
 
         //when, then
         assertThrows(IllegalStateException.class, () -> memberService.createMember(member));
@@ -51,12 +50,13 @@ public class MemberServiceTest {
         Member member = fakeMember(1L);
         Address address = member.getAddress();
 
-        //mocking
         given(memberRepository.findByLoginId(member.getLoginId()))
                 .willReturn(Optional.empty());
         given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
                 address.getDepth2(), address.getDepth3()))
                 .willReturn(Optional.empty());
+        given(memberRepository.save(member))
+                .willReturn(member);
 
         //when
         Long saveId = memberService.createMember(member);
@@ -74,12 +74,13 @@ public class MemberServiceTest {
         Address address = member.getAddress();
         Address existingAddress = fakeAddress(1L);
 
-        //mocking
         given(memberRepository.findByLoginId(member.getLoginId()))
                 .willReturn(Optional.empty());
         given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
                 address.getDepth2(), address.getDepth3()))
                 .willReturn(Optional.of(existingAddress));
+        given(memberRepository.save(member))
+                .willReturn(member);
 
         //when
         Long saveId = memberService.createMember(member);

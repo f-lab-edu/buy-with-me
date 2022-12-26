@@ -22,8 +22,7 @@ public class MemberService {
         checkDuplicateMemberExists(member);
         Optional<Address> address = checkDuplicateAddressExists(member.getAddress());
         address.ifPresent(member::setAddress);
-        memberRepository.save(member);
-        return member.getId();
+        return memberRepository.save(member).getId();
     }
 
     private void checkDuplicateMemberExists(Member member) {
