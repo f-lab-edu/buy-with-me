@@ -1,16 +1,15 @@
 package com.flab.buywithme.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.repository.AddressRepository;
 import com.flab.buywithme.repository.MemberRepository;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,27 +28,30 @@ public class MemberServiceTest {
     @Mock
     private AddressRepository addressRepository;
 
+    private Member member;
+    private Address address;
+
+    @BeforeEach
+    public void setup() {
+        member = fakeMember(1L);
+        address = member.getAddress();
+    }
+
     @Test
     @DisplayName("loginId 중복 시 예외 발생")
     public void existingLoginIdFail() {
         //given
-        Member member = fakeMember(1L);
-
         given(memberRepository.findByLoginId(member.getLoginId()))
                 .willReturn(Optional.of(member));
 
         //when, then
         assertThrows(IllegalStateException.class, () -> memberService.createMember(member));
-
     }
 
     @Test
     @DisplayName("회원가입 성공")
     public void signUpSuccess() {
         //given
-        Member member = fakeMember(1L);
-        Address address = member.getAddress();
-
         given(memberRepository.findByLoginId(member.getLoginId()))
                 .willReturn(Optional.empty());
         given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
@@ -59,21 +61,17 @@ public class MemberServiceTest {
                 .willReturn(member);
 
         //when
-        Long saveId = memberService.createMember(member);
+        memberService.createMember(member);
 
         //then
-        assertEquals(member.getId(), saveId);
-        assertNull(member.getAddress().getId());
+        then(memberRepository).should().save(fakeMember(1L));
     }
 
     @Test
     @DisplayName("회원가입 시 기존에 address table에 존재하는 주소 조회 성공")
     public void addressLookupSuccess() {
         //given
-        Member member = fakeMember(1L);
-        Address address = member.getAddress();
         Address existingAddress = fakeAddress(1L);
-
         given(memberRepository.findByLoginId(member.getLoginId()))
                 .willReturn(Optional.empty());
         given(addressRepository.findByDepth1AndDepth2AndDepth3(address.getDepth1(),
@@ -83,11 +81,12 @@ public class MemberServiceTest {
                 .willReturn(member);
 
         //when
-        Long saveId = memberService.createMember(member);
+        memberService.createMember(member);
 
         //then
-        assertEquals(member.getId(), saveId);
-        assertNotNull(member.getAddress().getId());
+        Member expected = fakeMember(1L);
+        expected.setAddress(fakeAddress(1L));
+        then(memberRepository).should().save(expected);
     }
 
     private Member fakeMember(Long memberId) {
