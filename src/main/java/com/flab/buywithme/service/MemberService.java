@@ -2,6 +2,8 @@ package com.flab.buywithme.service;
 
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.error.CustomException;
+import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.AddressRepository;
 import com.flab.buywithme.repository.MemberRepository;
 import java.util.Optional;
@@ -28,12 +30,19 @@ public class MemberService {
     private void checkDuplicateMemberExists(Member member) {
         Optional<Member> findMember = memberRepository.findByLoginId(member.getLoginId());
         if (findMember.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 회원입니다!");
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXIST);
         }
     }
 
     public Optional<Member> findById(Long memberId) {
         return memberRepository.findById(memberId);
+    }
+
+    public Member signIn(String loginId, String password) {
+        return memberRepository.findByLoginId(loginId).stream()
+                .filter(m -> m.getPassword().equals(password))
+                .findAny()
+                .orElse(null);
     }
 
     private Optional<Address> checkDuplicateAddressExists(Address address) {
