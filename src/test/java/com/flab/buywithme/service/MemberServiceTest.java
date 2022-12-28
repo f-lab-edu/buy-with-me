@@ -1,11 +1,15 @@
 package com.flab.buywithme.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.error.CustomException;
+import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.AddressRepository;
 import com.flab.buywithme.repository.MemberRepository;
 import java.util.Optional;
@@ -45,7 +49,9 @@ public class MemberServiceTest {
                 .willReturn(Optional.of(member));
 
         //when, then
-        assertThrows(IllegalStateException.class, () -> memberService.createMember(member));
+        CustomException ex = assertThrows(CustomException.class,
+                () -> memberService.createMember(member));
+        assertEquals(ex.getErrorCode(), ErrorCode.MEMBER_ALREADY_EXIST);
     }
 
     @Test
@@ -87,6 +93,32 @@ public class MemberServiceTest {
         Member expected = fakeMember(1L);
         expected.setAddress(fakeAddress(1L));
         then(memberRepository).should().save(expected);
+    }
+
+    @Test
+    public void 로그인성공() {
+        //given
+        given(memberRepository.findByLoginId(member.getLoginId()))
+                .willReturn(Optional.of(member));
+
+        //when
+        Member loginMember = memberService.signIn(member.getLoginId(), member.getPassword());
+
+        //then
+        assertEquals(fakeMember(1L), loginMember);
+    }
+
+    @Test
+    public void 로그인실패() {
+        //given
+        given(memberRepository.findByLoginId(member.getLoginId()))
+                .willReturn(Optional.empty());
+
+        //when
+        Member loginMember = memberService.signIn(member.getLoginId(), member.getPassword());
+
+        //then
+        assertNull(loginMember);
     }
 
     private Member fakeMember(Long memberId) {
