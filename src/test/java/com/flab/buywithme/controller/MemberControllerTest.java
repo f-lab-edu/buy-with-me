@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,10 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.buywithme.config.TestConfig;
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.dto.MemberSignInDTO;
+import com.flab.buywithme.dto.MemberSignUpDTO;
 import com.flab.buywithme.service.MemberService;
 import com.flab.buywithme.utils.HashingUtil;
 import com.flab.buywithme.utils.SessionConst;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,37 +55,39 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    void signUpSuccess() throws Exception {
-        HashMap<String, String> body = new HashMap<>();
-        body.put("name", "kim");
-        body.put("phoneNo", "010-1111-1111");
-        body.put("loginId", "test");
-        body.put("password", "test1");
-        body.put("depth1", "성남시");
-        body.put("depth2", "분당구");
-        body.put("depth3", "판교동");
+    public void signUpSuccess() throws Exception {
+        MemberSignUpDTO signUpRequest = MemberSignUpDTO.builder()
+                .name("kim")
+                .phoneNo("010-1111-1111")
+                .loginId("test")
+                .password("test1")
+                .depth1("성남시")
+                .depth2("분당구")
+                .depth3("판교동")
+                .build();
 
         mockMvc.perform(post("/members")
-                        .content(objectMapper.writeValueAsString(body))
+                        .content(objectMapper.writeValueAsString(signUpRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
     }
 
     @Test
-    @DisplayName("회원 가입 validation 실패")
-    void signUpValidationFail() throws Exception {
-        HashMap<String, String> body = new HashMap<>();
-        body.put("name", "kim");
-        //phoneNo 존재 x
-        body.put("loginId", "test");
-        body.put("password", "test1");
-        body.put("depth1", "성남시");
-        body.put("depth2", "분당구");
-        body.put("depth3", "판교동");
+    @DisplayName("필수값 누락 시 회원 가입 실패")
+    public void signUpValidationFail() throws Exception {
+        //phoneNo 누락
+        MemberSignUpDTO invalidSignUpRequest = MemberSignUpDTO.builder()
+                .name("kim")
+                .loginId("test")
+                .password("test1")
+                .depth1("성남시")
+                .depth2("분당구")
+                .depth3("판교동")
+                .build();
 
         mockMvc.perform(post("/members")
-                        .content(objectMapper.writeValueAsString(body))
+                        .content(objectMapper.writeValueAsString(invalidSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().string("[phoneNo](은)는 필수값입니다 입력된 값: [null]\n"))
@@ -91,37 +96,34 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("로그인 성공")
-    void signInSuccess() throws Exception {
-        HashMap<String, String> body = new HashMap<>();
-        body.put("loginId", "test");
-        body.put("password", "test1");
+    public void signInSuccess() throws Exception {
+        MemberSignInDTO loginRequest = new MemberSignInDTO("test", "test1");
         Member existingMember = fakeMember(1L);
 
-        given(memberService.signIn(body.get("loginId"), HashingUtil.encrypt(body.get("password"))))
+        given(memberService.signIn(any(String.class), any(String.class)))
                 .willReturn(existingMember);
 
         mockMvc.perform(post("/members/signin")
-                        .content(objectMapper.writeValueAsString(body))
+                        .content(objectMapper.writeValueAsString(loginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .session(session))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
+        then(memberService).should().signIn("test", HashingUtil.encrypt("test1"));
         assertEquals(1L, session.getAttribute(SessionConst.LOGIN_MEMBER));
     }
 
     @Test
     @DisplayName("로그인 실패")
-    void signInFail() throws Exception {
-        HashMap<String, String> body = new HashMap<>();
-        body.put("loginId", "test");
-        body.put("password", "wrongVal");
+    public void signInFail() throws Exception {
+        MemberSignInDTO invalidLoginRequest = new MemberSignInDTO("test", "wrongPW");
 
-        given(memberService.signIn(body.get("loginId"), HashingUtil.encrypt(body.get("password"))))
+        given(memberService.signIn(any(String.class), any(String.class)))
                 .willReturn(null);
 
         mockMvc.perform(post("/members/signin")
-                        .content(objectMapper.writeValueAsString(body))
+                        .content(objectMapper.writeValueAsString(invalidLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().is4xxClientError())
@@ -134,7 +136,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("로그아웃 성공")
-    void signOutSuccess() throws Exception {
+    public void signOutSuccess() throws Exception {
         session.setAttribute(SessionConst.LOGIN_MEMBER, 1L);
 
         mockMvc.perform(post("/members/signout")
@@ -147,7 +149,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("로그인한 멤버가 아니면 로그아웃 시도 시 로그인 페이지로 redirection")
-    void signOutFail() throws Exception {
+    public void signOutFail() throws Exception {
         mockMvc.perform(post("/members/signout"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("/members/signin?redirectURL=/**"))
@@ -156,7 +158,7 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("비밀번호 해싱 결과 비교")
-    void checkPasswordHashing() {
+    public void checkPasswordHashing() {
         Member existingMember = fakeMember(1L);
         String original_password = "test1";
 
