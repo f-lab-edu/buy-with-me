@@ -69,13 +69,25 @@ class PostServiceTest {
 
     @Test
     @DisplayName("게시글 가져오기 성공")
-    public void getPost() {
+    public void getPostSuccess() {
         given(postRepository.findById(postId))
                 .willReturn(Optional.ofNullable(post));
 
-        Post findPost = postService.getPost(postId).orElse(null);
+        Post findPost = postService.getPost(postId);
 
         assertEquals(findPost, fakePost(1L));
+    }
+
+    @Test
+    @DisplayName("게시글 가져오기 실패")
+    public void getPostFail() {
+        given(postRepository.findById(postId))
+                .willReturn(Optional.empty());
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> postService.getPost(postId));
+
+        assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
 
     @Test
@@ -97,21 +109,14 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 게시글에 대한 수정 실패")
-    public void updatePostFail() {
-        given(postRepository.findById(postId))
-                .willReturn(Optional.empty());
-
-        CustomException ex = assertThrows(CustomException.class,
-                () -> postService.updatePost(postId, any(PostDTO.class)));
-        assertEquals(ex.getErrorCode(), ErrorCode.INVALID_UPDATE);
-    }
-
-    @Test
     @DisplayName("게시글 삭제 성공")
     public void deletePost() {
+        given(postRepository.findById(postId))
+                .willReturn(Optional.ofNullable(post));
+
         postService.deletePost(postId);
-        then(postRepository).should().deleteById(postId);
+
+        then(postRepository).should().delete(fakePost(1L));
     }
 
     private Member fakeMember(Long memberId) {

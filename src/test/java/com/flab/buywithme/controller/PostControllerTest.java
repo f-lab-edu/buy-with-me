@@ -20,7 +20,6 @@ import com.flab.buywithme.service.PostService;
 import com.flab.buywithme.utils.HashingUtil;
 import com.flab.buywithme.utils.SessionConst;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,7 +62,7 @@ class PostControllerTest {
     public void createPost() throws Exception {
         Member currentMember = fakeMember(1L);
         given(memberService.findById(any(Long.class)))
-                .willReturn(Optional.of(currentMember));
+                .willReturn(currentMember);
 
         PostDTO postDTO = PostDTO.builder()
                 .title("test 게시물")
