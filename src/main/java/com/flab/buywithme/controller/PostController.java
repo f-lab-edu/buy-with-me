@@ -7,7 +7,6 @@ import com.flab.buywithme.service.MemberService;
 import com.flab.buywithme.service.PostService;
 import com.flab.buywithme.utils.SessionConst;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,7 +30,7 @@ public class PostController {
     @PostMapping
     public void createPost(@Valid @RequestBody PostDTO postDTO,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        Member findMember = memberService.findById(memberId).get();
+        Member findMember = memberService.findById(memberId);
 
         Post newPost = Post.builder()
                 .member(findMember)
@@ -51,7 +50,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public Optional<Post> getPost(@PathVariable Long postId) {
+    public Post getPost(@PathVariable Long postId) {
         return postService.getPost(postId);
     }
 

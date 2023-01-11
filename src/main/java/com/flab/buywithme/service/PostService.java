@@ -6,7 +6,6 @@ import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.PostRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +27,19 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Post> getPost(Long postId) {
-        return postRepository.findById(postId);
+    public Post getPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 
     public void updatePost(Long postId, PostDTO postDTO) {
-        Post post = getPost(postId).orElseThrow(() ->
-                new CustomException(ErrorCode.INVALID_UPDATE));
-
+        Post post = getPost(postId);
         post.update(postDTO.getTitle(), postDTO.getContent(), postDTO.getTargetNo(),
                 postDTO.getExpiration());
     }
 
     public void deletePost(Long postId) {
-        postRepository.deleteById(postId);
+        Post post = getPost(postId);
+        postRepository.delete(post);
     }
 }
