@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberSignInDTO {
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 20)
     private String loginId;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 20)
     private String password;
 }

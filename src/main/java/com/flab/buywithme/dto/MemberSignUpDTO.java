@@ -13,31 +13,31 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MemberSignUpDTO {
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 10)
     private String name;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 20)
     private String phoneNo;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 20)
     private String loginId;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 20)
     private String password;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 10)
     private String depth1;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 10)
     private String depth2;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 10)
     private String depth3;
 }

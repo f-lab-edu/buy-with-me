@@ -19,19 +19,19 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PostDTO {
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 100)
     private String title;
 
-    @NotBlank(message = "필수값입니다")
+    @NotBlank
     @Size(max = 500)
     private String content;
 
-    @NotNull(message = "필수값입니다")
+    @NotNull
     @Min(1)
     private int targetNo;
 
-    @NotNull(message = "필수값입니다")
+    @NotNull
     @Future
     private LocalDateTime expiration;
 }
