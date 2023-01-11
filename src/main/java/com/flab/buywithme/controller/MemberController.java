@@ -44,7 +44,7 @@ public class MemberController {
                 HashingUtil.encrypt(signInDTO.getPassword()));
 
         if (loginMember == null) {
-            throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
+            throw new CustomException(ErrorCode.INVALID_ID_PW);
         }
 
         HttpSession httpSession = request.getSession();
