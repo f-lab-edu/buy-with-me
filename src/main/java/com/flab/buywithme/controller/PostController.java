@@ -55,12 +55,15 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public void updatePost(@PathVariable Long postId, @Valid @RequestBody PostDTO postDTO) {
-        postService.updatePost(postId, postDTO);
+    public void updatePost(@PathVariable Long postId,
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId,
+            @Valid @RequestBody PostDTO postDTO) {
+        postService.updatePost(postId, memberId, postDTO);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    public void deletePost(@PathVariable Long postId,
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        postService.deletePost(postId, memberId);
     }
 }

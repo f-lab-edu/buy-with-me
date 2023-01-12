@@ -32,14 +32,20 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
     }
 
-    public void updatePost(Long postId, PostDTO postDTO) {
+    public void updatePost(Long postId, Long memberId, PostDTO postDTO) {
         Post post = getPost(postId);
+        if (!post.checkIsOwner(memberId)) {
+            throw new CustomException(ErrorCode.IS_NOT_OWNER);
+        }
         post.update(postDTO.getTitle(), postDTO.getContent(), postDTO.getTargetNo(),
                 postDTO.getExpiration());
     }
 
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, Long memberId) {
         Post post = getPost(postId);
+        if (!post.checkIsOwner(memberId)) {
+            throw new CustomException(ErrorCode.IS_NOT_OWNER);
+        }
         postRepository.delete(post);
     }
 }

@@ -57,4 +57,8 @@ public class Post {
         this.targetNo = targetNo;
         this.expiration = expiration;
     }
+
+    public boolean checkIsOwner(Long memberId) {
+        return this.member.getId().equals(memberId);
+    }
 }

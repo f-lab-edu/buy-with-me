@@ -48,19 +48,21 @@ class PostControllerTest {
     private MemberService memberService;
 
     private MockHttpSession mockSession;
-    private long postID;
+    private Long postID;
+    private Long memberID;
 
     @BeforeEach
     public void setUp() {
         mockSession = new MockHttpSession();
         mockSession.setAttribute(SessionConst.LOGIN_MEMBER, 1L);
         postID = 1L;
+        memberID = 1L;
     }
 
     @Test
     @DisplayName("게시글 작성 요청 성공")
     public void createPost() throws Exception {
-        Member currentMember = fakeMember(1L);
+        Member currentMember = fakeMember(memberID);
         given(memberService.findById(any(Long.class)))
                 .willReturn(currentMember);
 
@@ -73,7 +75,7 @@ class PostControllerTest {
 
         mockMvc.perform(post("/posts")
                         .content(objectMapper.writeValueAsString(postDTO))
-                        .sessionAttr("memberId", 1L)
+                        .sessionAttr("memberId", memberID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
@@ -114,22 +116,24 @@ class PostControllerTest {
         mockMvc.perform(put("/posts/" + postID)
                         .content(objectMapper.writeValueAsString(updatePostDTO))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .sessionAttr("memberId", memberID)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().updatePost(postID, updatePostDTO);
+        then(postService).should().updatePost(postID, memberID, updatePostDTO);
     }
 
     @Test
     @DisplayName("게시글 삭제 요청 성공")
     public void deletePost() throws Exception {
         mockMvc.perform(delete("/posts/" + postID)
+                        .sessionAttr("memberId", memberID)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().deletePost(postID);
+        then(postService).should().deletePost(postID, memberID);
     }
 
     private Member fakeMember(Long memberId) {

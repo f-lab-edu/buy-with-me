@@ -37,12 +37,14 @@ class PostServiceTest {
     private PostRepository postRepository;
 
     private Post post;
-    private long postId;
+    private Long postId;
+    private Long memberId;
 
     @BeforeEach
     public void setup() {
         post = fakePost(1L);
         postId = 1L;
+        memberId = 1L;
     }
 
     @Test
@@ -53,7 +55,7 @@ class PostServiceTest {
 
         postService.savePost(post);
 
-        then(postRepository).should().save(fakePost(1L));
+        then(postRepository).should().save(fakePost(postId));
     }
 
     @Test
@@ -75,7 +77,7 @@ class PostServiceTest {
 
         Post findPost = postService.getPost(postId);
 
-        assertEquals(findPost, fakePost(1L));
+        assertEquals(findPost, fakePost(postId));
     }
 
     @Test
@@ -103,20 +105,32 @@ class PostServiceTest {
         given(postRepository.findById(postId))
                 .willReturn(Optional.ofNullable(post));
 
-        postService.updatePost(postId, updatePostDTO);
+        postService.updatePost(postId, memberId, updatePostDTO);
 
         assertEquals(post.getTitle(), "수정 test 게시물");
     }
 
     @Test
     @DisplayName("게시글 삭제 성공")
-    public void deletePost() {
+    public void deletePostSuccess() {
         given(postRepository.findById(postId))
                 .willReturn(Optional.ofNullable(post));
 
-        postService.deletePost(postId);
+        postService.deletePost(postId, memberId);
 
-        then(postRepository).should().delete(fakePost(1L));
+        then(postRepository).should().delete(fakePost(postId));
+    }
+
+    @Test
+    @DisplayName("작성자가 아니면 게시글 삭제 실패")
+    public void deletePostFail() {
+        given(postRepository.findById(postId))
+                .willReturn(Optional.ofNullable(post));
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> postService.deletePost(postId, 99L));
+
+        assertEquals(ex.getErrorCode(), ErrorCode.IS_NOT_OWNER);
     }
 
     private Member fakeMember(Long memberId) {
