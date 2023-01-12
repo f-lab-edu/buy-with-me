@@ -2,6 +2,9 @@ package com.flab.buywithme.exhandler.advice;
 
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackages = "com.flab.buywithme.controller")
 public class ExControllerAdvice {
 
+    @Autowired
+    private MessageSource ms;
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String processValidationEx(MethodArgumentNotValidException ex) {
@@ -22,11 +28,9 @@ public class ExControllerAdvice {
         StringBuilder builder = new StringBuilder();
 
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            builder.append("[");
-            builder.append(fieldError.getField());
-            builder.append("](은)는 ");
-            builder.append(fieldError.getDefaultMessage());
-            builder.append(" 입력된 값: [");
+            builder.append(ms.getMessage(fieldError, LocaleContextHolder.getLocale()));
+            builder.append(System.getProperty("line.separator"));
+            builder.append("입력된 값: [");
             builder.append(fieldError.getRejectedValue());
             builder.append("]");
             builder.append(System.getProperty("line.separator"));

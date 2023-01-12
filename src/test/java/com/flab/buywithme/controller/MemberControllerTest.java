@@ -90,7 +90,7 @@ class MemberControllerTest {
                         .content(objectMapper.writeValueAsString(invalidSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError())
-                .andExpect(content().string("[phoneNo](은)는 필수값입니다 입력된 값: [null]\n"))
+                .andExpect(content().string("phoneNo(은)는 필수 값 입니다\n입력된 값: [null]\n"))
                 .andDo(log());
     }
 
