@@ -34,18 +34,20 @@ public class PostService {
 
     public void updatePost(Long postId, Long memberId, PostDTO postDTO) {
         Post post = getPost(postId);
-        if (!post.checkIsOwner(memberId)) {
-            throw new CustomException(ErrorCode.IS_NOT_OWNER);
-        }
+        checkWhetherAuthor(post, memberId);
         post.update(postDTO.getTitle(), postDTO.getContent(), postDTO.getTargetNo(),
                 postDTO.getExpiration());
     }
 
     public void deletePost(Long postId, Long memberId) {
         Post post = getPost(postId);
+        checkWhetherAuthor(post, memberId);
+        postRepository.delete(post);
+    }
+
+    public void checkWhetherAuthor(Post post, Long memberId) {
         if (!post.checkIsOwner(memberId)) {
             throw new CustomException(ErrorCode.IS_NOT_OWNER);
         }
-        postRepository.delete(post);
     }
 }
