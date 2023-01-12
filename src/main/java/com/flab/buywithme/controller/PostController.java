@@ -30,7 +30,7 @@ public class PostController {
     @PostMapping
     public void createPost(@Valid @RequestBody PostDTO postDTO,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        Member findMember = memberService.findById(memberId);
+        Member findMember = memberService.getMember(memberId);
 
         Post newPost = Post.builder()
                 .member(findMember)

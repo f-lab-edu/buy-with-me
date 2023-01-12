@@ -63,7 +63,7 @@ class PostControllerTest {
     @DisplayName("게시글 작성 요청 성공")
     public void createPost() throws Exception {
         Member currentMember = fakeMember(memberID);
-        given(memberService.findById(any(Long.class)))
+        given(memberService.getMember(any(Long.class)))
                 .willReturn(currentMember);
 
         PostDTO postDTO = PostDTO.builder()

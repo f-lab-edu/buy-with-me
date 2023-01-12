@@ -34,7 +34,7 @@ public class MemberService {
         }
     }
 
-    public Member findById(Long memberId) {
+    public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
