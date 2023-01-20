@@ -1,7 +1,6 @@
 package com.flab.buywithme.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static com.flab.buywithme.TestFixture.fakePostDTO;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,12 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.buywithme.config.TestConfig;
-import com.flab.buywithme.domain.Address;
-import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.dto.PostDTO;
-import com.flab.buywithme.service.MemberService;
 import com.flab.buywithme.service.PostService;
-import com.flab.buywithme.utils.HashingUtil;
+import com.flab.buywithme.service.common.CommonMemberService;
+import com.flab.buywithme.service.common.CommonPostService;
 import com.flab.buywithme.utils.SessionConst;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +42,10 @@ class PostControllerTest {
     private PostService postService;
 
     @MockBean
-    private MemberService memberService;
+    private CommonMemberService commonMemberService;
+
+    @MockBean
+    private CommonPostService commonPostService;
 
     private MockHttpSession mockSession;
     private Long postID;
@@ -62,16 +62,7 @@ class PostControllerTest {
     @Test
     @DisplayName("게시글 작성 요청 성공")
     public void createPost() throws Exception {
-        Member currentMember = fakeMember(memberID);
-        given(memberService.getMember(any(Long.class)))
-                .willReturn(currentMember);
-
-        PostDTO postDTO = PostDTO.builder()
-                .title("test 게시물")
-                .content("test 목적으로 생성하였음")
-                .targetNo(3)
-                .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
-                .build();
+        PostDTO postDTO = fakePostDTO();
 
         mockMvc.perform(post("/posts")
                         .content(objectMapper.writeValueAsString(postDTO))
@@ -80,6 +71,8 @@ class PostControllerTest {
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
+
+        then(postService).should().savePost(postDTO, memberID);
     }
 
     @Test
@@ -100,7 +93,7 @@ class PostControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().getPost(postID);
+        then(commonPostService).should().getPost(postID);
     }
 
     @Test
@@ -134,13 +127,5 @@ class PostControllerTest {
                 .andDo(log());
 
         then(postService).should().deletePost(postID, memberID);
-    }
-
-    private Member fakeMember(Long memberId) {
-        Member member = new Member(new Address("성남시", "분당구", "판교동"), "kim", "010-1111-1111",
-                "test", HashingUtil.encrypt("test1"));
-        member.setId(memberId);
-        member.getAddress().setId(1L);
-        return member;
     }
 }

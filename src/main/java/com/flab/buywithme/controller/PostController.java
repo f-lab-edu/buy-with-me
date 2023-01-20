@@ -1,10 +1,9 @@
 package com.flab.buywithme.controller;
 
-import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.dto.PostDTO;
-import com.flab.buywithme.service.MemberService;
 import com.flab.buywithme.service.PostService;
+import com.flab.buywithme.service.common.CommonPostService;
 import com.flab.buywithme.utils.SessionConst;
 import java.util.List;
 import javax.validation.Valid;
@@ -25,23 +24,12 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class PostController {
 
     private final PostService postService;
-    private final MemberService memberService;
+    private final CommonPostService commonPostService;
 
     @PostMapping
     public void createPost(@Valid @RequestBody PostDTO postDTO,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        Member findMember = memberService.getMember(memberId);
-
-        Post newPost = Post.builder()
-                .member(findMember)
-                .address(findMember.getAddress())
-                .title(postDTO.getTitle())
-                .content(postDTO.getContent())
-                .targetNo(postDTO.getTargetNo())
-                .expiration(postDTO.getExpiration())
-                .build();
-
-        postService.savePost(newPost);
+        postService.savePost(postDTO, memberId);
     }
 
     @GetMapping
@@ -51,7 +39,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public Post getPost(@PathVariable Long postId) {
-        return postService.getPost(postId);
+        return commonPostService.getPost(postId);
     }
 
     @PutMapping("/{postId}")

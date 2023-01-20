@@ -1,12 +1,8 @@
 package com.flab.buywithme.controller;
 
-import com.flab.buywithme.domain.Member;
-import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
 import com.flab.buywithme.dto.PostCommentDTO;
-import com.flab.buywithme.service.MemberService;
 import com.flab.buywithme.service.PostCommentService;
-import com.flab.buywithme.service.PostService;
 import com.flab.buywithme.utils.SessionConst;
 import java.util.List;
 import javax.validation.Valid;
@@ -26,24 +22,13 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @RequiredArgsConstructor
 public class PostCommentController {
 
-    private final PostService postService;
-    private final MemberService memberService;
     private final PostCommentService commentService;
 
     @PostMapping
     public void createComment(@Valid @RequestBody PostCommentDTO commentDTO,
             @PathVariable Long postId,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
-        Member member = memberService.getMember(memberId);
-        Post post = postService.getPost(postId);
-
-        PostComment newComment = PostComment.builder()
-                .post(post)
-                .member(member)
-                .content(commentDTO.getContent())
-                .build();
-
-        commentService.saveComment(newComment);
+        commentService.saveComment(commentDTO, postId, memberId);
     }
 
     @GetMapping
