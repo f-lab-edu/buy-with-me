@@ -1,6 +1,7 @@
 package com.flab.buywithme;
 
 import com.flab.buywithme.domain.Address;
+import com.flab.buywithme.domain.Enroll;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
@@ -30,7 +31,7 @@ public class TestFixture {
                 .address(member.getAddress())
                 .title("test 게시물")
                 .content("test 목적으로 생성하였음")
-                .targetNo(3)
+                .targetNo(5)
                 .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
                 .build();
     }
@@ -58,5 +59,14 @@ public class TestFixture {
     public static PostCommentDTO fakeCommentDTO() {
         return new PostCommentDTO("test comment");
     }
-}
 
+    public static Enroll fakeEnroll(Long enrollId) {
+        Post post = fakePost(defaultPostID);
+        Member member = fakeMember(defaultMemberID);
+        return Enroll.builder()
+                .id(enrollId)
+                .member(member)
+                .post(post)
+                .build();
+    }
+}
