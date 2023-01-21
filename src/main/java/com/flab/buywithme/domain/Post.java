@@ -1,5 +1,6 @@
 package com.flab.buywithme.domain;
 
+import com.flab.buywithme.domain.enums.PostStatus;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,7 +45,10 @@ public class Post {
     private int targetNo;
 
     @Builder.Default
-    private boolean status = true;
+    private int currentNo = 0;
+
+    @Builder.Default
+    private PostStatus status = PostStatus.RUNNING;
 
     private LocalDateTime expiration;
 
@@ -60,5 +64,12 @@ public class Post {
 
     public boolean checkIsOwner(Long memberId) {
         return this.member.getId().equals(memberId);
+    }
+
+    public void increaseCurrentNo() {
+        this.currentNo += 1;
+        if (this.currentNo == this.targetNo) {
+            this.status = PostStatus.COMPLETE;
+        }
     }
 }

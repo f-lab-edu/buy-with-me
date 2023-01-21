@@ -12,7 +12,11 @@ import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.PostRepository;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,5 +65,46 @@ class CommonPostServiceTest {
 
         then(postRepository).should().findById(postId);
         assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("구매 참여 요청 시 currentNo 값 1 증가")
+    public void increaseJoinCountSuccess() {
+        int beforeCurrentNo = post.getCurrentNo();
+
+        commonPostService.increaseJoinCount(post);
+
+        assertEquals(beforeCurrentNo + 1, post.getCurrentNo());
+    }
+
+    @Test
+    @DisplayName("인원 모집 완료된 경우 currentNo 값 변화 없이 예외 발생")
+    public void increaseJoinCountSuccessFail() {
+        for (int i = 0; i < post.getTargetNo(); i++) {
+            commonPostService.increaseJoinCount(post);
+        }
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> commonPostService.increaseJoinCount(post));
+
+        assertEquals(ex.getErrorCode(), ErrorCode.GATHERING_FINISHED);
+    }
+
+    @Disabled
+    @Test
+    @DisplayName("동시 구매 참여 요청시 currentNo 값이 요청 수만큼 늘어남")
+    public void SimultaneousRequestProcessingSuccess() throws InterruptedException {
+        int numOfExecute = post.getTargetNo();
+        ExecutorService executorService = Executors.newFixedThreadPool(numOfExecute);
+        CountDownLatch countDownLatch = new CountDownLatch(numOfExecute);
+
+        for (int i = 0; i < numOfExecute; i++) {
+            executorService.execute(() -> {
+                commonPostService.increaseJoinCount(post);
+                countDownLatch.countDown();
+            });
+        }
+        countDownLatch.await();
+        assertEquals(post.getTargetNo(), post.getCurrentNo());
     }
 }
