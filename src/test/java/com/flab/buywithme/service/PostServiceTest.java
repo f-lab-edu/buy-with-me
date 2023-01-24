@@ -1,24 +1,27 @@
 package com.flab.buywithme.service;
 
+import static com.flab.buywithme.TestFixture.fakeMember;
+import static com.flab.buywithme.TestFixture.fakePost;
+import static com.flab.buywithme.TestFixture.fakePostDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.PostRepository;
-import com.flab.buywithme.utils.HashingUtil;
+import com.flab.buywithme.service.common.CommonMemberService;
+import com.flab.buywithme.service.common.CommonPostService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,11 +30,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class})
 class PostServiceTest {
 
     @InjectMocks
     private PostService postService;
+
+    @Mock
+    private CommonPostService commonPostService;
+
+    @Mock
+    private CommonMemberService commonMemberService;
 
     @Mock
     private PostRepository postRepository;
@@ -42,20 +51,34 @@ class PostServiceTest {
 
     @BeforeEach
     public void setup() {
-        post = fakePost(1L);
         postId = 1L;
         memberId = 1L;
+        post = fakePost(postId);
     }
 
     @Test
     @DisplayName("게시글 저장 성공")
     public void savePost() {
+        Member member = fakeMember(memberId);
+        PostDTO postDTO = fakePostDTO();
+
+        given(commonMemberService.getMember(anyLong()))
+                .willReturn(member);
         given(postRepository.save(any(Post.class)))
                 .willReturn(post);
 
-        postService.savePost(post);
+        postService.savePost(postDTO, memberId);
 
-        then(postRepository).should().save(fakePost(postId));
+        Post expected = Post.builder()
+                .member(member)
+                .address(member.getAddress())
+                .title(postDTO.getTitle())
+                .content(postDTO.getContent())
+                .targetNo(postDTO.getTargetNo())
+                .expiration(postDTO.getExpiration())
+                .build();
+
+        then(postRepository).should().save(expected);
     }
 
     @Test
@@ -70,29 +93,6 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 가져오기 성공")
-    public void getPostSuccess() {
-        given(postRepository.findById(postId))
-                .willReturn(Optional.ofNullable(post));
-
-        Post findPost = postService.getPost(postId);
-
-        assertEquals(findPost, fakePost(postId));
-    }
-
-    @Test
-    @DisplayName("게시글 가져오기 실패")
-    public void getPostFail() {
-        given(postRepository.findById(postId))
-                .willReturn(Optional.empty());
-
-        CustomException ex = assertThrows(CustomException.class,
-                () -> postService.getPost(postId));
-
-        assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
-    }
-
-    @Test
     @DisplayName("게시글 수정 성공")
     public void updatePostSuccess() {
         PostDTO updatePostDTO = PostDTO.builder()
@@ -102,8 +102,8 @@ class PostServiceTest {
                 .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
                 .build();
 
-        given(postRepository.findById(postId))
-                .willReturn(Optional.ofNullable(post));
+        given(commonPostService.getPost(anyLong()))
+                .willReturn(post);
 
         postService.updatePost(postId, memberId, updatePostDTO);
 
@@ -113,8 +113,8 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글 삭제 성공")
     public void deletePostSuccess() {
-        given(postRepository.findById(postId))
-                .willReturn(Optional.ofNullable(post));
+        given(commonPostService.getPost(anyLong()))
+                .willReturn(post);
 
         postService.deletePost(postId, memberId);
 
@@ -124,33 +124,12 @@ class PostServiceTest {
     @Test
     @DisplayName("작성자가 아니면 게시글 삭제 실패")
     public void deletePostFail() {
-        given(postRepository.findById(postId))
-                .willReturn(Optional.ofNullable(post));
+        given(commonPostService.getPost(anyLong()))
+                .willReturn(post);
 
         CustomException ex = assertThrows(CustomException.class,
                 () -> postService.deletePost(postId, 99L));
 
         assertEquals(ex.getErrorCode(), ErrorCode.IS_NOT_OWNER);
-    }
-
-    private Member fakeMember(Long memberId) {
-        Member member = new Member(new Address("성남시", "분당구", "판교동"), "kim", "010-1111-1111",
-                "test", HashingUtil.encrypt("test1"));
-        member.setId(memberId);
-        member.getAddress().setId(1L);
-        return member;
-    }
-
-    private Post fakePost(Long postId) {
-        Member member = fakeMember(1L);
-        return Post.builder()
-                .id(postId)
-                .member(member)
-                .address(member.getAddress())
-                .title("test 게시물")
-                .content("test 목적으로 생성하였음")
-                .targetNo(3)
-                .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
-                .build();
     }
 }
