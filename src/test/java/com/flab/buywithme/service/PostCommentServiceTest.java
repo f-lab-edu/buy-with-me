@@ -6,7 +6,6 @@ import static com.flab.buywithme.TestFixture.fakeMember;
 import static com.flab.buywithme.TestFixture.fakePost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -82,6 +81,8 @@ class PostCommentServiceTest {
                 .content(commentDTO.getContent())
                 .build();
 
+        then(commonMemberService).should().getMember(memberId);
+        then(commonPostService).should().getPost(postId);
         then(commentRepository).should().save(expected);
     }
 
@@ -93,7 +94,8 @@ class PostCommentServiceTest {
                 .willReturn(comments);
 
         List<PostComment> expectList = Arrays.asList(fakeComment(1L), fakeComment(2L));
-        assertTrue(commentService.getAllComment(postId).equals(expectList));
+        assertEquals(expectList, commentService.getAllComment(postId));
+        then(commentRepository).should().findAllByPost_Id(postId);
     }
 
     @Test
@@ -104,6 +106,7 @@ class PostCommentServiceTest {
 
         PostComment findComment = commentService.getComment(commentId);
 
+        then(commentRepository).should().findById(commentId);
         assertEquals(findComment, fakeComment(commentId));
     }
 
@@ -116,6 +119,7 @@ class PostCommentServiceTest {
         CustomException ex = assertThrows(CustomException.class,
                 () -> commentService.getComment(commentId));
 
+        then(commentRepository).should().findById(commentId);
         assertEquals(ex.getErrorCode(), ErrorCode.COMMENT_NOT_FOUND);
     }
 
@@ -129,6 +133,7 @@ class PostCommentServiceTest {
 
         commentService.updateComment(commentId, memberId, updateCommentDTO);
 
+        then(commentRepository).should().findById(commentId);
         assertEquals(comment.getContent(), "수정된 comment");
     }
 
@@ -140,6 +145,7 @@ class PostCommentServiceTest {
 
         commentService.deleteComment(commentId, memberId);
 
+        then(commentRepository).should().findById(commentId);
         then(commentRepository).should().delete(fakeComment(commentId));
     }
 
@@ -152,6 +158,7 @@ class PostCommentServiceTest {
         CustomException ex = assertThrows(CustomException.class,
                 () -> commentService.deleteComment(commentId, 99L));
 
+        then(commentRepository).should().findById(commentId);
         assertEquals(ex.getErrorCode(), ErrorCode.IS_NOT_OWNER);
     }
 }

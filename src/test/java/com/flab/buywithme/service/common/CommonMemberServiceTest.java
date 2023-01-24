@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.error.CustomException;
@@ -45,6 +46,7 @@ class CommonMemberServiceTest {
 
         Member findMember = commonMemberService.getMember(memberId);
 
+        then(memberRepository).should().findById(memberId);
         assertEquals(findMember, fakeMember(memberId));
     }
 
@@ -57,6 +59,7 @@ class CommonMemberServiceTest {
         CustomException ex = assertThrows(CustomException.class,
                 () -> commonMemberService.getMember(memberId));
 
+        then(memberRepository).should().findById(memberId);
         assertEquals(ex.getErrorCode(), ErrorCode.MEMBER_NOT_FOUND);
     }
 }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.error.CustomException;
@@ -45,6 +46,7 @@ class CommonPostServiceTest {
 
         Post findPost = commonPostService.getPost(postId);
 
+        then(postRepository).should().findById(postId);
         assertEquals(findPost, fakePost(postId));
     }
 
@@ -57,6 +59,7 @@ class CommonPostServiceTest {
         CustomException ex = assertThrows(CustomException.class,
                 () -> commonPostService.getPost(postId));
 
+        then(postRepository).should().findById(postId);
         assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
 }
