@@ -1,6 +1,7 @@
 package com.flab.buywithme.controller;
 
 import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,9 +42,9 @@ class EnrollControllerTest {
     }
 
     @Test
-    @DisplayName("구매 참여 요철 성공")
+    @DisplayName("구매 참여 요청 성공")
     void join() throws Exception {
-        mockMvc.perform(post("/posts/" + postId + "/join")
+        mockMvc.perform(post("/posts/" + postId + "/enrolls")
                         .sessionAttr("memberId", memberId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
@@ -55,7 +56,7 @@ class EnrollControllerTest {
     @Test
     @DisplayName("구매 참여 취소 요청 성공")
     void cancel() throws Exception {
-        mockMvc.perform(post("/posts/" + postId + "/cancel")
+        mockMvc.perform(delete("/posts/" + postId + "/enrolls")
                         .sessionAttr("memberId", memberId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())

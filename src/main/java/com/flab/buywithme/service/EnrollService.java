@@ -22,13 +22,14 @@ public class EnrollService {
     private final CommonMemberService commonMemberService;
 
     public void joinBuying(Long postId, Long memberId) {
-        enrollRepository.findByPost_idAndMember_Id(postId, memberId)
+        Post post = commonPostService.getPostForUpdate(postId);
+        Member member = commonMemberService.getMember(memberId);
+
+        enrollRepository.findByPost_IdAndMember_Id(postId, memberId)
                 .ifPresent(e -> {
                     throw new CustomException(ErrorCode.ENROLL_ALREADY_DONE);
                 });
 
-        Post post = commonPostService.getPost(postId);
-        Member member = commonMemberService.getMember(memberId);
         Enroll enroll = Enroll.builder()
                 .member(member)
                 .post(post)
@@ -39,7 +40,7 @@ public class EnrollService {
     }
 
     public void cancelJoining(Long postId, Long memberId) {
-        enrollRepository.delete(enrollRepository.findByPost_idAndMember_Id(postId,
+        enrollRepository.delete(enrollRepository.findByPost_IdAndMember_Id(postId,
                 memberId).orElseThrow(() -> new CustomException(ErrorCode.ENROLL_NOT_FOUND)));
     }
 }

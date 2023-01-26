@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EnrollRepository extends JpaRepository<Enroll, Long> {
 
-    Optional<Enroll> findByPost_idAndMember_Id(Long postId, Long memberId);
+    Optional<Enroll> findByPost_IdAndMember_Id(Long postId, Long memberId);
 }
