@@ -5,9 +5,12 @@ import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.service.PostService;
 import com.flab.buywithme.service.common.CommonPostService;
 import com.flab.buywithme.utils.SessionConst;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -33,8 +37,17 @@ public class PostController {
     }
 
     @GetMapping
-    public List<Post> getAllPost() {
-        return postService.getAllPost();
+    public Page<Post> getPostsWithKeyword(
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
+        return postService.searchPostWithKeyword(keyword, pageable);
+    }
+
+    @GetMapping("/addresses/{addressId}")
+    public Page<Post> getSameAddressPosts(
+            @PathVariable Long addressId,
+            @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
+        return postService.searchSameAddressPost(addressId, pageable);
     }
 
     @GetMapping("/{postId}")
