@@ -62,4 +62,53 @@ class CommonPostServiceTest {
         then(postRepository).should().findById(postId);
         assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
     }
+
+    @Test
+    @DisplayName("업데이트 목적의 게시글 가져오기 성공")
+    public void getPostForUpdateSuccess() {
+        given(postRepository.findByIdForUpdate(anyLong()))
+                .willReturn(Optional.ofNullable(post));
+
+        Post findPost = commonPostService.getPostForUpdate(postId);
+
+        then(postRepository).should().findByIdForUpdate(postId);
+        assertEquals(findPost, fakePost(postId));
+    }
+
+    @Test
+    @DisplayName("업데이트 목적의 게시글 가져오기 실패")
+    public void getPostForUpdateFail() {
+        given(postRepository.findByIdForUpdate(anyLong()))
+                .willReturn(Optional.empty());
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> commonPostService.getPostForUpdate(postId));
+
+        then(postRepository).should().findByIdForUpdate(postId);
+        assertEquals(ex.getErrorCode(), ErrorCode.POST_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("구매 참여 요청 시 currentNo 값 1 증가")
+    public void increaseJoinCountSuccess() {
+        int beforeCurrentNo = post.getCurrentNo();
+
+        commonPostService.increaseJoinCount(post);
+
+        assertEquals(beforeCurrentNo + 1, post.getCurrentNo());
+    }
+
+    @Test
+    @DisplayName("인원 모집 완료된 경우 currentNo 값 변화 없이 예외 발생")
+    public void increaseJoinCountSuccessFail() {
+        for (int i = 0; i < post.getTargetNo(); i++) {
+            commonPostService.increaseJoinCount(post);
+        }
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> commonPostService.increaseJoinCount(post));
+
+        assertEquals(ex.getErrorCode(), ErrorCode.GATHERING_FINISHED);
+        assertEquals(post.getTargetNo(), post.getCurrentNo());
+    }
 }
