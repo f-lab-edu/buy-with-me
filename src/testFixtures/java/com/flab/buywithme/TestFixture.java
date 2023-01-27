@@ -23,6 +23,12 @@ public class TestFixture {
         return member;
     }
 
+    public static Address fakeAddress(Long addressId) {
+        Address address = new Address("성남시", "분당구", "판교동");
+        address.setId(addressId);
+        return address;
+    }
+
     public static Post fakePost(Long postId) {
         Member member = fakeMember(defaultMemberID);
         return Post.builder()
@@ -31,7 +37,7 @@ public class TestFixture {
                 .address(member.getAddress())
                 .title("test 게시물")
                 .content("test 목적으로 생성하였음")
-                .targetNo(5)
+                .targetNo(100)
                 .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
                 .build();
     }
