@@ -1,11 +1,11 @@
 package com.flab.buywithme.service;
 
 import static com.flab.buywithme.TestFixture.fakeMember;
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static com.flab.buywithme.TestFixture.fakePost;
 import static com.flab.buywithme.TestFixture.fakePostDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -20,8 +20,6 @@ import com.flab.buywithme.repository.PostRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith({MockitoExtension.class})
 class PostServiceTest {
@@ -78,18 +77,29 @@ class PostServiceTest {
                 .expiration(postDTO.getExpiration())
                 .build();
 
+        then(commonMemberService).should().getMember(memberId);
         then(postRepository).should().save(expected);
     }
 
     @Test
-    @DisplayName("전체 게시글 가져오기 성공")
-    public void getAllPost() {
-        List<Post> posts = Arrays.asList(fakePost(1L), fakePost(2L));
-        given(postRepository.findAll())
-                .willReturn(posts);
+    @DisplayName("키워드 기반 게시글 검색 성공")
+    public void searchPostSuccess() {
+        Pageable pageable = fakePageable();
 
-        List<Post> expectList = Arrays.asList(fakePost(1L), fakePost(2L));
-        assertTrue(postService.getAllPost().equals(expectList));
+        postService.searchPostWithKeyword("test", pageable);
+
+        then(postRepository).should().findByTitleContainingOrContentContaining("test", pageable);
+    }
+
+    @Test
+    @DisplayName("주소 기반 게시글 검색 성공")
+    public void searchSameAddressPostSuccess() {
+        Pageable pageable = fakePageable();
+        Long addressId = 1L;
+
+        postService.searchSameAddressPost(addressId, pageable);
+
+        then(postRepository).should().findByAddress_Id(addressId, pageable);
     }
 
     @Test
@@ -107,6 +117,7 @@ class PostServiceTest {
 
         postService.updatePost(postId, memberId, updatePostDTO);
 
+        then(commonPostService).should().getPost(postId);
         assertEquals(post.getTitle(), "수정 test 게시물");
     }
 
@@ -118,6 +129,7 @@ class PostServiceTest {
 
         postService.deletePost(postId, memberId);
 
+        then(commonPostService).should().getPost(postId);
         then(postRepository).should().delete(fakePost(postId));
     }
 
@@ -130,6 +142,7 @@ class PostServiceTest {
         CustomException ex = assertThrows(CustomException.class,
                 () -> postService.deletePost(postId, 99L));
 
+        then(commonPostService).should().getPost(postId);
         assertEquals(ex.getErrorCode(), ErrorCode.IS_NOT_OWNER);
     }
 }
