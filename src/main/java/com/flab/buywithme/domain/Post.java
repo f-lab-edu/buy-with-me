@@ -1,6 +1,7 @@
 package com.flab.buywithme.domain;
 
 import com.flab.buywithme.domain.enums.PostStatus;
+import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -71,5 +72,20 @@ public class Post {
         if (this.currentNo == this.targetNo) {
             this.status = PostStatus.COMPLETE;
         }
+    }
+
+    @VisibleForTesting
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @VisibleForTesting
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @VisibleForTesting
+    public void setCreatedAt(LocalDateTime createdTime) {
+        this.createdAt = createdTime;
     }
 }

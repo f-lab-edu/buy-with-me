@@ -9,6 +9,10 @@ import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.utils.HashingUtil;
 import java.time.LocalDateTime;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 public class TestFixture {
 
@@ -74,5 +78,9 @@ public class TestFixture {
                 .member(member)
                 .post(post)
                 .build();
+    }
+
+    public static Pageable fakePageable() {
+        return PageRequest.of(0, 2, Sort.by(Order.desc("createdAt")));
     }
 }
