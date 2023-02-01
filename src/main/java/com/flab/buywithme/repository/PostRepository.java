@@ -16,7 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "select p from Post p where p.id = :id")
     Optional<Post> findByIdForUpdate(@Param("id") Long postId);
 
-    @Query(value = "select p from Post p where p.title LIKE %:keyword% or p.content LIKE %:keyword%")
+    @Query(value = "select p from Post p where function('match_against', p.title, p.content, :keyword) > 0")
     Page<Post> findByTitleContainingOrContentContaining(@Param("keyword") String keyword,
             Pageable pageable);
 
