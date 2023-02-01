@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: local-db
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/data:/var/lib/mysql
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+    env_file: .env
+    environment:
+      TZ: Asia/Seoul
