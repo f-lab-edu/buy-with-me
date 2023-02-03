@@ -4,6 +4,7 @@ import static com.flab.buywithme.TestFixture.fakeComment;
 import static com.flab.buywithme.TestFixture.fakeCommentDTO;
 import static com.flab.buywithme.TestFixture.fakeMember;
 import static com.flab.buywithme.TestFixture.fakePost;
+import static com.flab.buywithme.TestFixture.fakeSubComment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +62,7 @@ class PostCommentServiceTest {
 
     @Test
     @DisplayName("댓글 저장 성공")
-    public void savePost() {
+    public void saveComment() {
         Member currentMember = fakeMember(memberId);
         Post currentPost = fakePost(postId);
         PostCommentDTO commentDTO = fakeCommentDTO();
@@ -83,6 +84,39 @@ class PostCommentServiceTest {
 
         then(commonMemberService).should().getMember(memberId);
         then(commonPostService).should().getPost(postId);
+        then(commentRepository).should().save(expected);
+    }
+
+    @Test
+    @DisplayName("대댓글 저장 성공")
+    public void saveSubComment() {
+        Long subCommentId = 2L;
+        Member currentMember = fakeMember(memberId);
+        Post currentPost = fakePost(postId);
+        PostCommentDTO commentDTO = fakeCommentDTO();
+        PostComment subComment = fakeSubComment(subCommentId);
+
+        given(commonMemberService.getMember(anyLong()))
+                .willReturn(currentMember);
+        given(commonPostService.getPost(anyLong()))
+                .willReturn(currentPost);
+        given(commentRepository.findById(anyLong()))
+                .willReturn(Optional.ofNullable(comment));
+        given(commentRepository.save(any(PostComment.class)))
+                .willReturn(subComment);
+
+        commentService.saveSubComment(commentId, commentDTO, postId, memberId);
+
+        PostComment expected = PostComment.builder()
+                .post(currentPost)
+                .member(currentMember)
+                .content(commentDTO.getContent())
+                .parent(comment)
+                .build();
+
+        then(commonMemberService).should().getMember(memberId);
+        then(commonPostService).should().getPost(postId);
+        then(commentRepository).should().findById(commentId);
         then(commentRepository).should().save(expected);
     }
 
@@ -139,7 +173,7 @@ class PostCommentServiceTest {
 
     @Test
     @DisplayName("댓글 삭제 성공")
-    public void deletePostSuccess() {
+    public void deleteCommentSuccess() {
         given(commentRepository.findById(anyLong()))
                 .willReturn(Optional.ofNullable(comment));
 
@@ -151,7 +185,7 @@ class PostCommentServiceTest {
 
     @Test
     @DisplayName("작성자가 아니면 댓글 삭제 실패")
-    public void deletePostFail() {
+    public void deleteCommentFail() {
         given(commentRepository.findById(anyLong()))
                 .willReturn(Optional.ofNullable(comment));
 
