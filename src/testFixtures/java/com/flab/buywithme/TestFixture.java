@@ -18,6 +18,7 @@ public class TestFixture {
 
     private static final Long defaultMemberID = 1L;
     private static final Long defaultPostID = 1L;
+    private static final Long defaultCommentID = 1L;
 
     public static Member fakeMember(Long memberId) {
         Member member = new Member(new Address("성남시", "분당구", "판교동"), "kim", "010-1111-1111",
@@ -63,6 +64,19 @@ public class TestFixture {
                 .post(post)
                 .member(member)
                 .content("test comment")
+                .build();
+    }
+
+    public static PostComment fakeSubComment(Long subCommentId) {
+        Post post = fakePost(defaultPostID);
+        Member member = fakeMember(defaultMemberID);
+        PostComment comment = fakeComment(defaultCommentID);
+        return PostComment.builder()
+                .id(subCommentId)
+                .post(post)
+                .member(member)
+                .content("test comment")
+                .parent(comment)
                 .build();
     }
 

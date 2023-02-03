@@ -32,13 +32,13 @@ CREATE TABLE IF NOT EXISTS `post`
     `created_at` datetime(6),
     `current_no` int    NOT NULL,
     `expiration` datetime(6),
-    `status`     int,
+    `status`     varchar(255),
     `target_no`  int    NOT NULL,
     `title`      varchar(255),
     `address_id` bigint,
     `member_id`  bigint,
     PRIMARY KEY (`post_id`),
-    FULLTEXT KEY ft_index (`title`, `content`) WITH PARSER `ngram`,
+    FULLTEXT KEY `ft_index` (`title`, `content`) WITH PARSER `ngram`,
     FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
     FOREIGN KEY (`address_id`) REFERENCES `address` (`address_id`)
 ) ENGINE = InnoDB
@@ -53,9 +53,11 @@ CREATE TABLE IF NOT EXISTS `post_comment`
     `updated_at` datetime(6),
     `member_id`  bigint,
     `post_id`    bigint,
+    `parent_id`  bigint,
     PRIMARY KEY (`comment_id`),
     FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
-    FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`)
+    FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`),
+    FOREIGN KEY (`parent_id`) REFERENCES `post_comment` (`comment_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
