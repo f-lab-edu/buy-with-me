@@ -3,6 +3,8 @@ package com.flab.buywithme.repository;
 import static com.flab.buywithme.TestFixture.fakePageable;
 import static com.flab.buywithme.TestFixture.fakePost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.flab.buywithme.config.JpaConfig;
 import com.flab.buywithme.domain.Post;
@@ -35,6 +37,12 @@ class PostRepositoryTest {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private PostCommentRepository postCommentRepository;
+
+    @Autowired
+    private EnrollRepository enrollRepository;
 
     @Autowired
     private DataSource dataSource;
@@ -93,5 +101,18 @@ class PostRepositoryTest {
         assertEquals(3, postRepository.findByAddress_Id(addressId, pageable).getTotalElements());
         assertEquals(0,
                 postRepository.findByAddress_Id(wrongAddressId, pageable).getTotalElements());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 시 해당 게시글의 댓글과 구매 참여 내역도 같이 삭제 성공")
+    void deletePostWithComment() {
+        assertFalse(postCommentRepository.findAllByPost_Id(postId).isEmpty());
+        assertFalse(enrollRepository.findAllByPost_Id(postId).isEmpty());
+
+        postRepository.deleteById(postId);
+
+        assertTrue(postRepository.findById(postId).isEmpty());
+        assertTrue(postCommentRepository.findAllByPost_Id(postId).isEmpty());
+        assertTrue(enrollRepository.findAllByPost_Id(postId).isEmpty());
     }
 }

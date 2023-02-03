@@ -1,16 +1,20 @@
 package com.flab.buywithme.domain;
 
 import com.flab.buywithme.domain.enums.PostStatus;
-import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDateTime;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -49,12 +53,19 @@ public class Post {
     private int currentNo = 0;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private PostStatus status = PostStatus.RUNNING;
 
     private LocalDateTime expiration;
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostComment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Enroll> enrolls;
 
     public void update(String title, String content, int targetNo, LocalDateTime expiration) {
         this.title = title;
@@ -72,20 +83,5 @@ public class Post {
         if (this.currentNo == this.targetNo) {
             this.status = PostStatus.COMPLETE;
         }
-    }
-
-    @VisibleForTesting
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @VisibleForTesting
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @VisibleForTesting
-    public void setCreatedAt(LocalDateTime createdTime) {
-        this.createdAt = createdTime;
     }
 }
