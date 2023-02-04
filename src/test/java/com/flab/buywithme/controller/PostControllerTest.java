@@ -108,7 +108,7 @@ class PostControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().searchSameAddressPost(addressId, pageable);
+        then(postService).should().getPostsByAddress(addressId, pageable);
     }
 
     @Test

@@ -44,7 +44,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> searchSameAddressPost(Long addressId, Pageable pageable) {
+    public Page<Post> getPostsByAddress(Long addressId, Pageable pageable) {
         return postRepository.findByAddress_Id(addressId, pageable);
     }
 

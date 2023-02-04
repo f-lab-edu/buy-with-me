@@ -97,7 +97,7 @@ class PostServiceTest {
         Pageable pageable = fakePageable();
         Long addressId = 1L;
 
-        postService.searchSameAddressPost(addressId, pageable);
+        postService.getPostsByAddress(addressId, pageable);
 
         then(postRepository).should().findByAddress_Id(addressId, pageable);
     }

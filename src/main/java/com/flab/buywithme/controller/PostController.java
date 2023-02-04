@@ -47,7 +47,7 @@ public class PostController {
     public Page<Post> getSameAddressPosts(
             @PathVariable Long addressId,
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
-        return postService.searchSameAddressPost(addressId, pageable);
+        return postService.getPostsByAddress(addressId, pageable);
     }
 
     @GetMapping("/{postId}")
