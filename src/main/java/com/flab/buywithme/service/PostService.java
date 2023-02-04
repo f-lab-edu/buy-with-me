@@ -8,8 +8,9 @@ import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.PostRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +39,13 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getAllPost() {
-        return postRepository.findAll();
+    public Page<Post> searchPostWithKeyword(String keyword, Pageable pageable) {
+        return postRepository.findByTitleContainingOrContentContaining(keyword, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Post> getPostsByAddress(Long addressId, Pageable pageable) {
+        return postRepository.findByAddress_Id(addressId, pageable);
     }
 
     public void updatePost(Long postId, Long memberId, PostDTO postDTO) {

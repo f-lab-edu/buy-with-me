@@ -1,5 +1,6 @@
 package com.flab.buywithme.controller;
 
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static com.flab.buywithme.TestFixture.fakePostDTO;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -24,9 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
 
 @WebMvcTest(controllers = PostController.class)
 @Import(TestConfig.class)
@@ -48,15 +51,17 @@ class PostControllerTest {
     private CommonPostService commonPostService;
 
     private MockHttpSession mockSession;
-    private Long postID;
-    private Long memberID;
+    private Long postId;
+    private Long memberId;
+    private Long addressId;
 
     @BeforeEach
     public void setUp() {
         mockSession = new MockHttpSession();
         mockSession.setAttribute(SessionConst.LOGIN_MEMBER, 1L);
-        postID = 1L;
-        memberID = 1L;
+        postId = 1L;
+        memberId = 1L;
+        addressId = 1L;
     }
 
     @Test
@@ -66,34 +71,55 @@ class PostControllerTest {
 
         mockMvc.perform(post("/posts")
                         .content(objectMapper.writeValueAsString(postDTO))
-                        .sessionAttr("memberId", memberID)
+                        .sessionAttr("memberId", memberId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().savePost(postDTO, memberID);
+        then(postService).should().savePost(postDTO, memberId);
     }
 
     @Test
-    @DisplayName("로그인하지 않은 멤버도 전체 게시글 가져오기 요청 성공")
-    public void getAllPost() throws Exception {
-        mockMvc.perform(get("/posts"))
+    @DisplayName("로그인하지 않은 멤버도 게시글 목록 가져오기 요청 성공")
+    public void getPosts() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("size", "2");
+        Pageable pageable = fakePageable();
+
+        mockMvc.perform(get("/posts")
+                        .params(requestParams))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().getAllPost();
+        then(postService).should().searchPostWithKeyword("", pageable);
+    }
+
+    @Test
+    @DisplayName("같은 주소(시-구-동)의 작성자가 쓴 게시글 목록 가져오기 요청 성공")
+    public void getSameAddressPosts() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("size", "2");
+        Pageable pageable = fakePageable();
+
+        mockMvc.perform(get("/posts/addresses/" + addressId)
+                        .params(requestParams)
+                        .session(mockSession))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(log());
+
+        then(postService).should().getPostsByAddress(addressId, pageable);
     }
 
     @Test
     @DisplayName("특정 게시글 가져오기 요청 성공")
     public void getPost() throws Exception {
-        mockMvc.perform(get("/posts/" + postID)
+        mockMvc.perform(get("/posts/" + postId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(commonPostService).should().getPost(postID);
+        then(commonPostService).should().getPost(postId);
     }
 
     @Test
@@ -106,26 +132,26 @@ class PostControllerTest {
                 .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
                 .build();
 
-        mockMvc.perform(put("/posts/" + postID)
+        mockMvc.perform(put("/posts/" + postId)
                         .content(objectMapper.writeValueAsString(updatePostDTO))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("memberId", memberID)
+                        .sessionAttr("memberId", memberId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().updatePost(postID, memberID, updatePostDTO);
+        then(postService).should().updatePost(postId, memberId, updatePostDTO);
     }
 
     @Test
     @DisplayName("게시글 삭제 요청 성공")
     public void deletePost() throws Exception {
-        mockMvc.perform(delete("/posts/" + postID)
-                        .sessionAttr("memberId", memberID)
+        mockMvc.perform(delete("/posts/" + postId)
+                        .sessionAttr("memberId", memberId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().deletePost(postID, memberID);
+        then(postService).should().deletePost(postId, memberId);
     }
 }
