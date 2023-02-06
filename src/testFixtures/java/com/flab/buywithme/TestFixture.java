@@ -3,8 +3,10 @@ package com.flab.buywithme;
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Enroll;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.domain.Notification;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
+import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.utils.HashingUtil;
@@ -42,7 +44,7 @@ public class TestFixture {
                 .address(member.getAddress())
                 .title("test 게시물")
                 .content("test 목적으로 생성하였음")
-                .targetNo(100)
+                .targetNo(2)
                 .expiration(LocalDateTime.of(2023, 4, 4, 23, 0, 0))
                 .build();
     }
@@ -96,5 +98,16 @@ public class TestFixture {
 
     public static Pageable fakePageable() {
         return PageRequest.of(0, 2, Sort.by(Order.desc("createdAt")));
+    }
+
+    public static Notification fakeNotification(Long notificationId, NotificationType type,
+            Boolean checked) {
+        Member member = fakeMember(defaultMemberID);
+        return Notification.builder()
+                .id(notificationId)
+                .member(member)
+                .notificationType(type)
+                .checked(checked)
+                .build();
     }
 }
