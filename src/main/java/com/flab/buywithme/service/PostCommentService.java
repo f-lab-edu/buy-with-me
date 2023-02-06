@@ -39,11 +39,15 @@ public class PostCommentService {
 
     public Long saveSubComment(Long commentId, PostCommentDTO commentDTO, Long postId,
             Long memberId) {
+        PostComment parent = getComment(commentId);
+
+        if (!parent.getPost().getId().equals(postId)) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
         Member member = commonMemberService.getMember(memberId);
 
         Post post = commonPostService.getPost(postId);
-
-        PostComment parent = getComment(commentId);
 
         PostComment newComment = PostComment.builder()
                 .post(post)

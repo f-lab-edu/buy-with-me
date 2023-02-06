@@ -11,6 +11,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
@@ -118,6 +120,23 @@ class PostCommentServiceTest {
         then(commonPostService).should().getPost(postId);
         then(commentRepository).should().findById(commentId);
         then(commentRepository).should().save(expected);
+    }
+
+    @Test
+    @DisplayName("잘못된 post-comment mapping으로 인한 대댓글 저장 실패")
+    public void saveSubCommentFail() {
+        PostCommentDTO commentDTO = fakeCommentDTO();
+        Long wrongPostId = 99L;
+
+        given(commentRepository.findById(anyLong()))
+                .willReturn(Optional.ofNullable(comment));
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> commentService.saveSubComment(commentId, commentDTO, wrongPostId, memberId));
+
+        then(commentRepository).should().findById(commentId);
+        assertEquals(ex.getErrorCode(), ErrorCode.COMMENT_NOT_FOUND);
+        verify(commentRepository, times(0)).save(any());
     }
 
     @Test
