@@ -1,6 +1,7 @@
 package com.flab.buywithme.domain;
 
 import com.flab.buywithme.domain.enums.PostStatus;
+import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -83,5 +84,15 @@ public class Post {
         if (this.currentNo == this.targetNo) {
             this.status = PostStatus.COMPLETE;
         }
+    }
+
+    @VisibleForTesting
+    public void setEnrolls(List<Enroll> enrollList) {
+        this.enrolls = enrollList;
+    }
+
+    @VisibleForTesting
+    public void setCurrentNo(int val) {
+        this.currentNo = val;
     }
 }

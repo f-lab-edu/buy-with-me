@@ -3,14 +3,17 @@ package com.flab.buywithme.service;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
+import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
+import com.flab.buywithme.event.NotificationEvent;
 import com.flab.buywithme.repository.PostCommentRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ public class PostCommentService {
     private final CommonMemberService commonMemberService;
     private final CommonPostService commonPostService;
     private final PostCommentRepository commentRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public Long saveComment(PostCommentDTO commentDTO, Long postId, Long memberId) {
         Member member = commonMemberService.getMember(memberId);
@@ -34,7 +38,12 @@ public class PostCommentService {
                 .content(commentDTO.getContent())
                 .build();
 
-        return commentRepository.save(newComment).getId();
+        commentRepository.save(newComment);
+
+        applicationEventPublisher.publishEvent(
+                new NotificationEvent(post.getMember(), NotificationType.COMMENT_ALERT));
+
+        return newComment.getId();
     }
 
     public Long saveSubComment(Long commentId, PostCommentDTO commentDTO, Long postId,
@@ -56,7 +65,12 @@ public class PostCommentService {
                 .parent(parent)
                 .build();
 
-        return commentRepository.save(newComment).getId();
+        commentRepository.save(newComment);
+
+        applicationEventPublisher.publishEvent(
+                new NotificationEvent(parent.getMember(), NotificationType.COMMENT_ALERT));
+
+        return newComment.getId();
     }
 
     @Transactional(readOnly = true)
