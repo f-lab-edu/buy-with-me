@@ -31,6 +31,14 @@ public class PostCommentController {
         commentService.saveComment(commentDTO, postId, memberId);
     }
 
+    @PostMapping("/{commentId}")
+    public void createSubComment(@PathVariable Long commentId,
+            @Valid @RequestBody PostCommentDTO commentDTO,
+            @PathVariable Long postId,
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER) Long memberId) {
+        commentService.saveSubComment(commentId, commentDTO, postId, memberId);
+    }
+
     @GetMapping
     public List<PostComment> getAllComment(@PathVariable Long postId) {
         return commentService.getAllComment(postId);

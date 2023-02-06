@@ -77,6 +77,22 @@ class PostCommentControllerTest {
     }
 
     @Test
+    @DisplayName("대댓글 작성 요청 성공")
+    public void createSubComment() throws Exception {
+        PostCommentDTO commentDTO = fakeCommentDTO();
+
+        mockMvc.perform(post("/posts/" + postId + "/comments/" + commentId)
+                        .content(objectMapper.writeValueAsString(commentDTO))
+                        .sessionAttr("memberId", memberId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .session(mockSession))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(log());
+
+        then(commentService).should().saveSubComment(commentId, commentDTO, postId, memberId);
+    }
+
+    @Test
     @DisplayName("게시글별 댓글 가져오기 요청 성공")
     public void getAllComment() throws Exception {
         mockMvc.perform(get("/posts/" + postId + "/comments")

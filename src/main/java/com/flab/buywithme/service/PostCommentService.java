@@ -37,6 +37,28 @@ public class PostCommentService {
         return commentRepository.save(newComment).getId();
     }
 
+    public Long saveSubComment(Long commentId, PostCommentDTO commentDTO, Long postId,
+            Long memberId) {
+        PostComment parent = getComment(commentId);
+
+        if (!parent.getPost().getId().equals(postId)) {
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        }
+
+        Member member = commonMemberService.getMember(memberId);
+
+        Post post = commonPostService.getPost(postId);
+
+        PostComment newComment = PostComment.builder()
+                .post(post)
+                .member(member)
+                .content(commentDTO.getContent())
+                .parent(parent)
+                .build();
+
+        return commentRepository.save(newComment).getId();
+    }
+
     @Transactional(readOnly = true)
     public List<PostComment> getAllComment(Long postId) {
         return commentRepository.findAllByPost_Id(postId);
