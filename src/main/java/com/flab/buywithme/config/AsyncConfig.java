@@ -17,9 +17,7 @@ public class AsyncConfig implements AsyncConfigurer {
 
         executor.setCorePoolSize(processors);
         executor.setMaxPoolSize(processors * 2);
-        executor.setQueueCapacity(60);
-        executor.setKeepAliveSeconds(60);
-        executor.setThreadNamePrefix("AsyncExecutor-");
+        executor.setThreadNamePrefix("NotificationAsyncTaskExecutor-");
         executor.initialize();
 
         return executor;
