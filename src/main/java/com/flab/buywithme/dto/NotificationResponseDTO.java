@@ -1,10 +1,10 @@
 package com.flab.buywithme.dto;
 
 import com.flab.buywithme.domain.Notification;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 @Getter
 @AllArgsConstructor
@@ -12,5 +12,5 @@ import lombok.Getter;
 public class NotificationResponseDTO {
 
     private int numberOfNotChecked;
-    private List<Notification> notifications;
+    private Page<Notification> notifications;
 }

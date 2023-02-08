@@ -33,3 +33,6 @@ VALUES (1, 1, "COMMENT_ALERT", true);
 
 INSERT INTO notification (notification_id, member_id, notification_type, checked)
 VALUES (2, 1, "TARGET_NUM_REACHED", false);
+
+INSERT INTO notification (notification_id, member_id, notification_type, checked)
+VALUES (3, 1, "ENROLL_CANCELED", false);

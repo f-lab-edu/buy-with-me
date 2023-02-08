@@ -1,18 +1,20 @@
 package com.flab.buywithme.service;
 
 import static com.flab.buywithme.TestFixture.fakeNotification;
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Notification;
-import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.NotificationResponseDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.NotificationRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +26,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith({MockitoExtension.class})
 class NotificationServiceTest {
@@ -42,26 +47,28 @@ class NotificationServiceTest {
     public void setup() {
         notificationId = 1L;
         memberId = 1L;
-        notification = fakeNotification(1L, NotificationType.COMMENT_ALERT, false);
+        notification = fakeNotification(1L, DomainEventType.CREATE_COMMENT, false);
     }
 
     @Test
     @DisplayName("알림 리스트 가져오기 성공")
     void getAllNotifications() {
         List<Notification> notifications = Arrays.asList(
-                fakeNotification(1L, NotificationType.COMMENT_ALERT, true), //읽은 알림
-                fakeNotification(2L, NotificationType.TARGET_NUM_REACHED, false)); //안 읽은 알림
-        NotificationResponseDTO expected = new NotificationResponseDTO(1, notifications);
+                fakeNotification(1L, DomainEventType.CREATE_COMMENT, true), //읽은 알림
+                fakeNotification(2L, DomainEventType.GATHER_SUCCESS, false)); //안 읽은 알림
+        Pageable pageable = fakePageable();
+        Page<Notification> notificationPage = new PageImpl<>(notifications);
+        NotificationResponseDTO expected = new NotificationResponseDTO(1, notificationPage);
 
-        given(notificationRepository.findAllByMember_id(anyLong()))
-                .willReturn(notifications);
+        given(notificationRepository.findAllByMember_id(anyLong(), any(Pageable.class)))
+                .willReturn(notificationPage);
         given(notificationRepository.countByMember_IdAndCheckedFalse(anyLong()))
                 .willReturn(1);
 
         NotificationResponseDTO result = notificationService.getAllNotifications(
-                memberId);
+                memberId, pageable);
 
-        then(notificationRepository).should().findAllByMember_id(memberId);
+        then(notificationRepository).should().findAllByMember_id(memberId, pageable);
         then(notificationRepository).should().countByMember_IdAndCheckedFalse(memberId);
         assertEquals(expected, result);
     }

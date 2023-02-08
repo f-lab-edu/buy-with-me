@@ -1,5 +1,6 @@
 package com.flab.buywithme.controller;
 
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
 
 @WebMvcTest(controllers = NotificationController.class)
 @Import(TestConfig.class)
@@ -45,13 +48,18 @@ class NotificationControllerTest {
     @Test
     @DisplayName("알림 리스트 가져오기 요청 성공")
     void getAllNotifications() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("size", "2");
+        Pageable pageable = fakePageable();
+
         mockMvc.perform(get("/notifications")
+                        .params(requestParams)
                         .sessionAttr("memberId", memberId)
                         .session(mockSession))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(notificationService).should().getAllNotifications(memberId);
+        then(notificationService).should().getAllNotifications(memberId, pageable);
     }
 
     @Test

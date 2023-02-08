@@ -1,5 +1,6 @@
 package com.flab.buywithme.repository;
 
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.Connection;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 @DataJpaTest
@@ -29,6 +31,7 @@ class NotificationRepositoryTest {
     private DataSource dataSource;
 
     private final Long memberId = 1L;
+    private final Pageable pageable = fakePageable();
 
     @BeforeAll
     public void beforeAll() throws Exception {
@@ -48,14 +51,18 @@ class NotificationRepositoryTest {
     @DisplayName("개별 회원의 알림 데이터 조회 성공")
     void findAllByMember_id() {
         Long wrongMemberId = 99L;
-        assertEquals(2, notificationRepository.findAllByMember_id(memberId).size());
-        assertEquals(0, notificationRepository.findAllByMember_id(wrongMemberId).size());
+        assertEquals(3,
+                notificationRepository.findAllByMember_id(memberId, pageable).getTotalElements());
+        assertEquals(2, notificationRepository.findAllByMember_id(memberId, pageable)
+                .getTotalPages()); //알림 개수: 3 페이지 크기: 2
+        assertEquals(0, notificationRepository.findAllByMember_id(wrongMemberId, pageable)
+                .getTotalElements());
     }
 
     @Test
     @DisplayName("개별 회원의 안 읽은 알림 개수 조회 성공")
     void countByMember_IdAndChecked() {
         int notCheckedNoti = notificationRepository.countByMember_IdAndCheckedFalse(memberId);
-        assertEquals(1, notCheckedNoti);
+        assertEquals(2, notCheckedNoti);
     }
 }

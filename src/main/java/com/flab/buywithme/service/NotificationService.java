@@ -5,8 +5,9 @@ import com.flab.buywithme.dto.NotificationResponseDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.repository.NotificationRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +19,9 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
-    public NotificationResponseDTO getAllNotifications(Long memberId) {
-        List<Notification> notifications = notificationRepository.findAllByMember_id(memberId);
+    public NotificationResponseDTO getAllNotifications(Long memberId, Pageable pageable) {
+        Page<Notification> notifications = notificationRepository.findAllByMember_id(memberId,
+                pageable);
         int notChecked = notificationRepository.countByMember_IdAndCheckedFalse(memberId);
         return new NotificationResponseDTO(notChecked, notifications);
     }
