@@ -1,29 +1,23 @@
 package com.flab.buywithme.service.common;
 
-import static com.flab.buywithme.TestFixture.fakeEnroll;
 import static com.flab.buywithme.TestFixture.fakePost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.flab.buywithme.domain.Post;
-import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
-import com.flab.buywithme.event.NotificationEvent;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostRepository;
-import java.util.Arrays;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,9 +34,6 @@ class CommonPostServiceTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
-
-    @Captor
-    ArgumentCaptor<NotificationEvent> captor;
 
     private Long postId;
     private Post post;
@@ -117,17 +108,13 @@ class CommonPostServiceTest {
     @DisplayName("목표 인원 달성 시 구매 참여자들과 작성자를 대상으로 publishEvent 성공")
     public void targetNumReachedEventPublishCheck() {
         post.setCurrentNo(post.getTargetNo() - 1);
-        post.setEnrolls(Arrays.asList(fakeEnroll(1L), fakeEnroll(2L)));
-        NotificationEvent expected = new NotificationEvent(post.getMember(),
-                NotificationType.TARGET_NUM_REACHED);
+        DomainEvent<Post> expectedEvent = new DomainEvent<>(
+                DomainEventType.GATHER_SUCCESS, post);
 
         commonPostService.increaseJoinCount(post);
 
         assertEquals(post.getTargetNo(), post.getCurrentNo());
-        verify(applicationEventPublisher, times(post.getTargetNo() + 1)).publishEvent(
-                captor.capture());
-        assertEquals(NotificationType.TARGET_NUM_REACHED,
-                captor.getAllValues().get(post.getTargetNo()).getNotificationType());
+        then(applicationEventPublisher).should().publishEvent(expectedEvent);
     }
 
     @Test

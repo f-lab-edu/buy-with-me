@@ -3,11 +3,11 @@ package com.flab.buywithme.service;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
-import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
-import com.flab.buywithme.event.NotificationEvent;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostCommentRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
@@ -41,7 +41,7 @@ public class PostCommentService {
         commentRepository.save(newComment);
 
         applicationEventPublisher.publishEvent(
-                new NotificationEvent(post.getMember(), NotificationType.COMMENT_ALERT));
+                new DomainEvent<>(DomainEventType.CREATE_COMMENT, post));
 
         return newComment.getId();
     }
@@ -68,7 +68,7 @@ public class PostCommentService {
         commentRepository.save(newComment);
 
         applicationEventPublisher.publishEvent(
-                new NotificationEvent(parent.getMember(), NotificationType.COMMENT_ALERT));
+                new DomainEvent<>(DomainEventType.CREATE_SUB_COMMENT, parent));
 
         return newComment.getId();
     }

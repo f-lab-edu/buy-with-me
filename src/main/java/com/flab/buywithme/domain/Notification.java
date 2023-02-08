@@ -1,6 +1,6 @@
 package com.flab.buywithme.domain;
 
-import com.flab.buywithme.domain.enums.NotificationType;
+import com.flab.buywithme.event.DomainEventType;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,7 +38,7 @@ public class Notification {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private NotificationType notificationType;
+    private DomainEventType domainEventType;
 
     private boolean checked;
 

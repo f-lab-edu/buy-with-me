@@ -1,6 +1,5 @@
 package com.flab.buywithme.service;
 
-import static com.flab.buywithme.TestFixture.fakeEnroll;
 import static com.flab.buywithme.TestFixture.fakeMember;
 import static com.flab.buywithme.TestFixture.fakePageable;
 import static com.flab.buywithme.TestFixture.fakePost;
@@ -11,23 +10,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
-import com.flab.buywithme.domain.Enroll;
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
-import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
-import com.flab.buywithme.event.NotificationEvent;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,10 +130,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글 삭제 성공")
     public void deletePostSuccess() {
-        List<Enroll> enrolls = Arrays.asList(fakeEnroll(1L));
-        post.setEnrolls(enrolls);
-        NotificationEvent expected = new NotificationEvent(post.getEnrolls().get(0).getMember(),
-                NotificationType.ENROLL_CANCELED);
+        DomainEvent<Post> expected = new DomainEvent<>(DomainEventType.DELETE_POST, post);
         given(commonPostService.getPost(anyLong()))
                 .willReturn(post);
 
@@ -147,7 +138,7 @@ class PostServiceTest {
 
         then(commonPostService).should().getPost(postId);
         then(postRepository).should().delete(fakePost(postId));
-        verify(applicationEventPublisher, times(enrolls.size())).publishEvent(expected);
+        then(applicationEventPublisher).should().publishEvent(expected);
     }
 
     @Test

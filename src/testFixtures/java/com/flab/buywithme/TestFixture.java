@@ -6,9 +6,9 @@ import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Notification;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
-import com.flab.buywithme.domain.enums.NotificationType;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.dto.PostDTO;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.utils.HashingUtil;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.PageRequest;
@@ -100,13 +100,13 @@ public class TestFixture {
         return PageRequest.of(0, 2, Sort.by(Order.desc("createdAt")));
     }
 
-    public static Notification fakeNotification(Long notificationId, NotificationType type,
+    public static Notification fakeNotification(Long notificationId, DomainEventType type,
             Boolean checked) {
         Member member = fakeMember(defaultMemberID);
         return Notification.builder()
                 .id(notificationId)
                 .member(member)
-                .notificationType(type)
+                .domainEventType(type)
                 .checked(checked)
                 .build();
     }
