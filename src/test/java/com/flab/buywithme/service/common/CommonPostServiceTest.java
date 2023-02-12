@@ -109,7 +109,7 @@ class CommonPostServiceTest {
     public void targetNumReachedEventPublishCheck() {
         post.setCurrentNo(post.getTargetNo() - 1);
         DomainEvent<Post> expectedEvent = new DomainEvent<>(
-                DomainEventType.GATHER_SUCCESS, post);
+                DomainEventType.UPDATE_POST, post);
 
         commonPostService.increaseJoinCount(post);
 

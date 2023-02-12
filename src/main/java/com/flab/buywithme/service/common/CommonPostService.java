@@ -39,7 +39,7 @@ public class CommonPostService {
 
             if (post.getStatus() == PostStatus.COMPLETE) {
                 applicationEventPublisher.publishEvent(
-                        new DomainEvent<>(DomainEventType.GATHER_SUCCESS, post));
+                        new DomainEvent<>(DomainEventType.UPDATE_POST, post));
             }
         }
     }

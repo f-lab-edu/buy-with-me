@@ -55,7 +55,7 @@ class NotificationServiceTest {
     void getAllNotifications() {
         List<Notification> notifications = Arrays.asList(
                 fakeNotification(1L, DomainEventType.CREATE_COMMENT, true), //읽은 알림
-                fakeNotification(2L, DomainEventType.GATHER_SUCCESS, false)); //안 읽은 알림
+                fakeNotification(2L, DomainEventType.UPDATE_POST, false)); //안 읽은 알림
         Pageable pageable = fakePageable();
         Page<Notification> notificationPage = new PageImpl<>(notifications);
         NotificationResponseDTO expected = new NotificationResponseDTO(1, notificationPage);
