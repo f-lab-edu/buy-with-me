@@ -10,6 +10,8 @@ import static org.mockito.BDDMockito.then;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith({MockitoExtension.class})
 class CommonPostServiceTest {
@@ -28,6 +31,9 @@ class CommonPostServiceTest {
 
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private Long postId;
     private Post post;
@@ -96,6 +102,19 @@ class CommonPostServiceTest {
         commonPostService.increaseJoinCount(post);
 
         assertEquals(beforeCurrentNo + 1, post.getCurrentNo());
+    }
+
+    @Test
+    @DisplayName("목표 인원 달성 시 구매 참여자들과 작성자를 대상으로 publishEvent 성공")
+    public void targetNumReachedEventPublishCheck() {
+        post.setCurrentNo(post.getTargetNo() - 1);
+        DomainEvent<Post> expectedEvent = new DomainEvent<>(
+                DomainEventType.UPDATE_POST, post);
+
+        commonPostService.increaseJoinCount(post);
+
+        assertEquals(post.getTargetNo(), post.getCurrentNo());
+        then(applicationEventPublisher).should().publishEvent(expectedEvent);
     }
 
     @Test

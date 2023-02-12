@@ -24,6 +24,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(NOT_FOUND, "해당 게시글이 존재하지 않습니다"),
     COMMENT_NOT_FOUND(NOT_FOUND, "해당 댓글이 존재하지 않습니다"),
     ENROLL_NOT_FOUND(NOT_FOUND, "등록 정보가 존재하지 않습니다"),
+    NOTIFICATION_NOT_FOUND(NOT_FOUND, "해당 알림이 존재하지 않습니다"),
 
     /* 409 CONFLICT : 서버의 상태와 충돌하는 경우 */
     MEMBER_ALREADY_EXIST(CONFLICT, "이미 존재하는 회원입니다"),

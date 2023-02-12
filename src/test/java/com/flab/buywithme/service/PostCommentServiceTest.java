@@ -20,6 +20,8 @@ import com.flab.buywithme.domain.PostComment;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostCommentRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class PostCommentServiceTest {
@@ -48,6 +51,9 @@ class PostCommentServiceTest {
 
     @Mock
     private CommonPostService commonPostService;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private PostComment comment;
     private Long postId;
@@ -68,6 +74,8 @@ class PostCommentServiceTest {
         Member currentMember = fakeMember(memberId);
         Post currentPost = fakePost(postId);
         PostCommentDTO commentDTO = fakeCommentDTO();
+        DomainEvent<Post> expectedEvent = new DomainEvent<>(DomainEventType.CREATE_COMMENT,
+                currentPost);
 
         given(commonMemberService.getMember(anyLong()))
                 .willReturn(currentMember);
@@ -87,6 +95,7 @@ class PostCommentServiceTest {
         then(commonMemberService).should().getMember(memberId);
         then(commonPostService).should().getPost(postId);
         then(commentRepository).should().save(expected);
+        then(applicationEventPublisher).should().publishEvent(expectedEvent);
     }
 
     @Test
@@ -97,6 +106,9 @@ class PostCommentServiceTest {
         Post currentPost = fakePost(postId);
         PostCommentDTO commentDTO = fakeCommentDTO();
         PostComment subComment = fakeSubComment(subCommentId);
+        DomainEvent<PostComment> expectedEvent = new DomainEvent<>(
+                DomainEventType.CREATE_SUB_COMMENT,
+                comment);
 
         given(commonMemberService.getMember(anyLong()))
                 .willReturn(currentMember);
@@ -120,6 +132,7 @@ class PostCommentServiceTest {
         then(commonPostService).should().getPost(postId);
         then(commentRepository).should().findById(commentId);
         then(commentRepository).should().save(expected);
+        then(applicationEventPublisher).should().publishEvent(expectedEvent);
     }
 
     @Test

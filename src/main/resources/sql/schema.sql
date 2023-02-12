@@ -75,3 +75,17 @@ CREATE TABLE IF NOT EXISTS `enroll`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `notification`
+(
+    `notification_id`   bigint NOT NULL AUTO_INCREMENT,
+    `checked`           bit(1) NOT NULL,
+    `notification_type` varchar(255),
+    `created_at`        datetime(6),
+    `updated_at`        datetime(6),
+    `member_id`         bigint,
+    PRIMARY KEY (`notification_id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;

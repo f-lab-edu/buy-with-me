@@ -27,3 +27,12 @@ VALUES (1, 1, "test comment");
 
 INSERT INTO post_comment (post_id, member_id, content, parent_id)
 VALUES (1, 1, "test sub comment", 1);
+
+INSERT INTO notification (notification_id, member_id, notification_type, checked)
+VALUES (1, 1, "COMMENT_ALERT", true);
+
+INSERT INTO notification (notification_id, member_id, notification_type, checked)
+VALUES (2, 1, "TARGET_NUM_REACHED", false);
+
+INSERT INTO notification (notification_id, member_id, notification_type, checked)
+VALUES (3, 1, "ENROLL_CANCELED", false);

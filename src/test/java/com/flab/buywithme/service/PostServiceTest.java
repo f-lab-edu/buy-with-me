@@ -16,6 +16,8 @@ import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
+import com.flab.buywithme.event.DomainEvent;
+import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith({MockitoExtension.class})
@@ -43,6 +46,9 @@ class PostServiceTest {
 
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private Post post;
     private Long postId;
@@ -124,6 +130,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글 삭제 성공")
     public void deletePostSuccess() {
+        DomainEvent<Post> expected = new DomainEvent<>(DomainEventType.DELETE_POST, post);
         given(commonPostService.getPost(anyLong()))
                 .willReturn(post);
 
@@ -131,6 +138,7 @@ class PostServiceTest {
 
         then(commonPostService).should().getPost(postId);
         then(postRepository).should().delete(fakePost(postId));
+        then(applicationEventPublisher).should().publishEvent(expected);
     }
 
     @Test
