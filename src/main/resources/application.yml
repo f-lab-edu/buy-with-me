@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: local
+
+  messages:
+    basename: errors
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        metadata_builder_contributor: com.flab.buywithme.config.SqlFunctionsMetadataBuilderContributor
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor

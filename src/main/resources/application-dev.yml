@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(vnTMbm/pJenCTDPpcbxRivKK7//pYXDaS8aeUYcpUO8td0xnPXLY8cOZ+E7LpMsVimW+vMc1UFHWUUANm+vJlc4prJtHcZuYvH6FYW4/qXyxRiHKgZKFP7vlzLxmEIAM)
+    username: ENC(9wPt5xIo2wXQkG7fXfpX9g==)
+    password: ENC(VoUGAjjXs08a/tJfOHT1sg==)
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      schema-locations: classpath:sql/schema.sql
+      mode: always
+
+logging:
+  level:
+    org.hibernate.SQL: debug

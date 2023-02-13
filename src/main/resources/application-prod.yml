@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(ILBwl04B7gTepUyaqoPiu7DqubIDt5uO1meEUWJZw6GSlMKGt9GWAw==)
+    username: ENC(Ol7ffoBs782PlXLQua/Qvw==)
+    password: ENC(0iGgz4s52hnsGCe63kRGjAD9+wHllKX2)
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    org.hibernate.SQL: info

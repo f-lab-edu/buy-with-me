@@ -3,6 +3,8 @@ package com.flab.buywithme.repository;
 import static com.flab.buywithme.TestFixture.fakePageable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.flab.buywithme.config.JasyptConfig;
+import com.flab.buywithme.config.JpaAuditingConfig;
 import java.sql.Connection;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.AfterAll;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -22,6 +25,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
+@Import({JasyptConfig.class, JpaAuditingConfig.class})
 class NotificationRepositoryTest {
 
     @Autowired

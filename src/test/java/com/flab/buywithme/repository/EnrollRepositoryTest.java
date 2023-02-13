@@ -3,6 +3,8 @@ package com.flab.buywithme.repository;
 import static com.flab.buywithme.TestFixture.fakeEnroll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.flab.buywithme.config.JasyptConfig;
+import com.flab.buywithme.config.JpaAuditingConfig;
 import com.flab.buywithme.domain.Enroll;
 import java.sql.Connection;
 import java.util.NoSuchElementException;
@@ -18,12 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
+@Import({JasyptConfig.class, JpaAuditingConfig.class})
 class EnrollRepositoryTest {
 
     @Autowired
