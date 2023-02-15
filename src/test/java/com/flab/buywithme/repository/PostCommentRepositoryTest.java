@@ -3,7 +3,8 @@ package com.flab.buywithme.repository;
 import static com.flab.buywithme.TestFixture.fakeSubComment;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.flab.buywithme.config.JpaConfig;
+import com.flab.buywithme.config.JasyptConfig;
+import com.flab.buywithme.config.JpaAuditingConfig;
 import com.flab.buywithme.domain.PostComment;
 import java.sql.Connection;
 import java.util.NoSuchElementException;
@@ -25,7 +26,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
-@Import(JpaConfig.class)
+@Import({JasyptConfig.class, JpaAuditingConfig.class})
 class PostCommentRepositoryTest {
 
     @Autowired

@@ -6,7 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.flab.buywithme.config.JpaConfig;
+import com.flab.buywithme.config.JasyptConfig;
+import com.flab.buywithme.config.JpaAuditingConfig;
 import com.flab.buywithme.domain.Post;
 import java.sql.Connection;
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestInstance(Lifecycle.PER_CLASS)
-@Import(JpaConfig.class)
+@Import({JasyptConfig.class, JpaAuditingConfig.class})
 class PostRepositoryTest {
 
     @Autowired
