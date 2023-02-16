@@ -21,6 +21,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application-local.yml
+src/test/resources/application.yml
 .idea
 *.iws
 *.iml
