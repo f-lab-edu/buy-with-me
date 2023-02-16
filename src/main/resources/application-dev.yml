@@ -5,13 +5,13 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ENC(vnTMbm/pJenCTDPpcbxRivKK7//pYXDaS8aeUYcpUO8td0xnPXLY8cOZ+E7LpMsVimW+vMc1UFHWUUANm+vJlc4prJtHcZuYvH6FYW4/qXyxRiHKgZKFP7vlzLxmEIAM)
+    url: ENC(AQtxcS8+4EroDjVap5LDVxVU0w33WZqJ8X+NSjqHKQp9FLAsAIkAiVYjqrskK+MB)
     username: ENC(9wPt5xIo2wXQkG7fXfpX9g==)
     password: ENC(VoUGAjjXs08a/tJfOHT1sg==)
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     defer-datasource-initialization: true
 
   sql:

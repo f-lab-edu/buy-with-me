@@ -38,6 +38,7 @@ public class Notification {
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "notification_type")
     private DomainEventType domainEventType;
 
     private boolean checked;
