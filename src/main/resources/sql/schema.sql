@@ -81,11 +81,28 @@ CREATE TABLE IF NOT EXISTS `notification`
     `notification_id`   bigint NOT NULL AUTO_INCREMENT,
     `checked`           bit(1) NOT NULL,
     `notification_type` varchar(255),
+    `member_id`         bigint,
+    `form_url`          varchar(255),
     `created_at`        datetime(6),
     `updated_at`        datetime(6),
-    `member_id`         bigint,
     PRIMARY KEY (`notification_id`),
     FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `member_evaluation`
+(
+    `evaluation_id` bigint NOT NULL AUTO_INCREMENT,
+    `post_id`       bigint,
+    `member_id`     bigint,
+    `colleague_id`  bigint,
+    `created_at`    datetime(6),
+    `content`       varchar(255),
+    PRIMARY KEY (`evaluation_id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member` (`member_id`),
+    FOREIGN KEY (`post_id`) REFERENCES `post` (`post_id`),
+    FOREIGN KEY (`colleague_id`) REFERENCES `member` (`member_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;

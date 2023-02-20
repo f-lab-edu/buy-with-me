@@ -5,6 +5,10 @@ INSERT INTO member (login_id, name, password, phone_no, address_id)
 VALUES ("test", "kim", "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
         "010-1111-1111", 1);
 
+INSERT INTO member (login_id, name, password, phone_no, address_id)
+VALUES ("test2", "mun", "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
+        "010-1111-1111", 1);
+
 INSERT INTO post (title, content, created_at, expiration, status, current_no, target_no, address_id,
                   member_id)
 VALUES ("test 게시물", "test 목적으로 생성하였음", "2023-02-01 12:00:00", "2023-04-04 23:00:00", "RUNNING", 0,
@@ -28,11 +32,14 @@ VALUES (1, 1, "test comment");
 INSERT INTO post_comment (post_id, member_id, content, parent_id)
 VALUES (1, 1, "test sub comment", 1);
 
-INSERT INTO notification (notification_id, member_id, notification_type, checked)
-VALUES (1, 1, "CREATE_COMMENT", true);
+INSERT INTO notification (member_id, notification_type, checked)
+VALUES (1, "CREATE_COMMENT", true);
 
-INSERT INTO notification (notification_id, member_id, notification_type, checked)
-VALUES (2, 1, "UPDATE_POST", false);
+INSERT INTO notification (member_id, notification_type, checked)
+VALUES (1, "UPDATE_POST", false);
 
-INSERT INTO notification (notification_id, member_id, notification_type, checked)
-VALUES (3, 1, "DELETE_POST", false);
+INSERT INTO notification (member_id, notification_type, checked)
+VALUES (1, "DELETE_POST", false);
+
+INSERT INTO member_evaluation (post_id, member_id, colleague_id, content)
+VALUES (1, 2, 1, "test eval")
