@@ -1,5 +1,5 @@
 package com.flab.buywithme.domain.enums;
 
 public enum PostStatus {
-    RUNNING, COMPLETE
+    RUNNING, GATHER_COMPLETE, BUYING_COMPLETE
 }

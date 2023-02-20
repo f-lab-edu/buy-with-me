@@ -17,14 +17,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CreateNotificationWhenPostStatusUpdatedToComplete implements DomainEventHandler<Post> {
+public class CreateNotificationWhenPostStatusUpdatedToBuyingComplete implements
+        DomainEventHandler<Post> {
 
     private final NotificationRepository notificationRepository;
 
     @Override
     public boolean canHandle(DomainEvent<Post> event) {
         return event.getDomainEventType() == DomainEventType.UPDATE_POST
-                && event.getSource().getStatus() == PostStatus.COMPLETE;
+                && event.getSource().getStatus() == PostStatus.BUYING_COMPLETE;
     }
 
     @Override
@@ -38,13 +39,20 @@ public class CreateNotificationWhenPostStatusUpdatedToComplete implements Domain
         members.add(post.getMember());
 
         for (Member member : members) {
-            notificationRepository.save(
-                    Notification.builder()
-                            .member(member)
-                            .checked(false)
-                            .domainEventType(event.getDomainEventType())
-                            .build()
-            );
+            for (Member colleague : members) {
+                if (member.equals(colleague)) {
+                    continue;
+                }
+                notificationRepository.save(
+                        Notification.builder()
+                                .member(member)
+                                .checked(false)
+                                .formUrl("/colleagueEvaluateForm/" + post.getId() + "/"
+                                        + colleague.getId())
+                                .domainEventType(event.getDomainEventType())
+                                .build()
+                );
+            }
         }
     }
 }

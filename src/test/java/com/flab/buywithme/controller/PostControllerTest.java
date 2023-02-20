@@ -5,6 +5,7 @@ import static com.flab.buywithme.TestFixture.fakePostDTO;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -12,9 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.buywithme.config.TestConfig;
+import com.flab.buywithme.domain.enums.PostStatus;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.service.PostService;
-import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
 import com.flab.buywithme.utils.SessionConst;
 import java.time.LocalDateTime;
@@ -43,9 +44,6 @@ class PostControllerTest {
 
     @MockBean
     private PostService postService;
-
-    @MockBean
-    private CommonMemberService commonMemberService;
 
     @MockBean
     private CommonPostService commonPostService;
@@ -137,6 +135,19 @@ class PostControllerTest {
                 .andDo(log());
 
         then(commonPostService).should().getPost(postId);
+    }
+
+    @Test
+    @DisplayName("게시글 상태 업데이트 요청 성공")
+    public void updatePostStatus() throws Exception {
+        mockMvc.perform(patch("/posts/" + postId)
+                        .param("postStatus", "BUYING_COMPLETE")
+                        .sessionAttr("memberId", memberId)
+                        .session(mockSession))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(log());
+
+        then(postService).should().updatePostStatus(postId, memberId, PostStatus.BUYING_COMPLETE);
     }
 
     @Test

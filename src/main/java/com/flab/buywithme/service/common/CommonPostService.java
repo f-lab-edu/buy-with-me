@@ -32,12 +32,12 @@ public class CommonPostService {
 
     @Transactional
     public void increaseJoinCount(Post post) {
-        if (post.getStatus() == PostStatus.COMPLETE) {
+        if (post.getStatus() == PostStatus.GATHER_COMPLETE) {
             throw new CustomException(ErrorCode.GATHERING_FINISHED);
         } else {
             post.increaseCurrentNo();
 
-            if (post.getStatus() == PostStatus.COMPLETE) {
+            if (post.getStatus() == PostStatus.GATHER_COMPLETE) {
                 applicationEventPublisher.publishEvent(
                         new DomainEvent<>(DomainEventType.UPDATE_POST, post));
             }

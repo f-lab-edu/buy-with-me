@@ -13,6 +13,7 @@ import static org.mockito.BDDMockito.then;
 
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
+import com.flab.buywithme.domain.enums.PostStatus;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
@@ -135,6 +136,20 @@ class PostServiceTest {
 
         then(commonPostService).should().getPost(postId);
         assertEquals(post.getTitle(), "수정 test 게시물");
+    }
+
+    @Test
+    @DisplayName("게시글 상태 업데이트 성공")
+    public void updatePostStatusSuccess() {
+        DomainEvent<Post> expected = new DomainEvent<>(DomainEventType.UPDATE_POST, post);
+        given(commonPostService.getPost(anyLong()))
+                .willReturn(post);
+
+        postService.updatePostStatus(postId, memberId, PostStatus.BUYING_COMPLETE);
+
+        then(commonPostService).should().getPost(postId);
+        assertEquals(PostStatus.BUYING_COMPLETE, post.getStatus());
+        then(applicationEventPublisher).should().publishEvent(expected);
     }
 
     @Test

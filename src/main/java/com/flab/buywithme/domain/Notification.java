@@ -43,6 +43,8 @@ public class Notification {
 
     private boolean checked;
 
+    private String formUrl;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
