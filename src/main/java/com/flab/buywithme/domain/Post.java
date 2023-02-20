@@ -68,6 +68,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<Enroll> enrolls;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<MemberEvaluation> evaluations;
+
     public void update(String title, String content, int targetNo, LocalDateTime expiration) {
         this.title = title;
         this.content = content;
@@ -82,8 +85,12 @@ public class Post {
     public void increaseCurrentNo() {
         this.currentNo += 1;
         if (this.currentNo == this.targetNo) {
-            this.status = PostStatus.COMPLETE;
+            this.status = PostStatus.GATHER_COMPLETE;
         }
+    }
+
+    public void updateStatus(PostStatus postStatus) {
+        this.status = postStatus;
     }
 
     @VisibleForTesting

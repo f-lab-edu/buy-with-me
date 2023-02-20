@@ -43,6 +43,12 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Enroll> enrolls;
 
+    @OneToMany(mappedBy = "colleague", cascade = CascadeType.REMOVE)
+    private List<MemberEvaluation> receivedEvaluations;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<MemberEvaluation> sentEvaluations;
+
     public Member(Address address, String name, String phoneNo, String loginId,
             String password) {
         this.address = address;
