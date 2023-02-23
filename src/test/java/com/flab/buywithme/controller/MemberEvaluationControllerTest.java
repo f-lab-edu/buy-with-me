@@ -57,7 +57,7 @@ class MemberEvaluationControllerTest {
     public void createEvaluation() throws Exception {
         MemberEvaluationDTO memberEvaluationDTO = fakeMemberEvaluationDTO();
 
-        mockMvc.perform(post("/evaluations/" + postId + "/" + colleagueId)
+        mockMvc.perform(post("/posts/" + postId + "/members/" + colleagueId + "/evaluations")
                         .content(objectMapper.writeValueAsString(memberEvaluationDTO))
                         .contentType(MediaType.APPLICATION_JSON)
                         .sessionAttr("memberId", memberId)
