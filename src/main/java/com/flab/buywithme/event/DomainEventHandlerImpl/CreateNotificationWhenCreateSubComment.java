@@ -8,6 +8,7 @@ import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class CreateNotificationWhenCreateSubComment implements DomainEventHandle
     }
 
     @Override
+    @Transactional
     public void handle(DomainEvent<PostComment> event) {
         PostComment comment = event.getSource();
 

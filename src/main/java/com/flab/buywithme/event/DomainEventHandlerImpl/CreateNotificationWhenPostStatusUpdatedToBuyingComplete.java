@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class CreateNotificationWhenPostStatusUpdatedToBuyingComplete implements
     }
 
     @Override
+    @Transactional
     public void handle(DomainEvent<Post> event) {
         Post post = event.getSource();
 
