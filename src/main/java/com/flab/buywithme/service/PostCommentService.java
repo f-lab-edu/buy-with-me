@@ -40,6 +40,8 @@ public class PostCommentService {
 
         commentRepository.save(newComment);
 
+        post.addComment(newComment);
+
         applicationEventPublisher.publishEvent(
                 new DomainEvent<>(DomainEventType.CREATE_COMMENT, post));
 
@@ -66,6 +68,8 @@ public class PostCommentService {
                 .build();
 
         commentRepository.save(newComment);
+
+        parent.addChildren(newComment);
 
         applicationEventPublisher.publishEvent(
                 new DomainEvent<>(DomainEventType.CREATE_SUB_COMMENT, parent));

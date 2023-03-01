@@ -37,6 +37,7 @@ public class EnrollService {
 
         commonPostService.increaseJoinCount(post);
         enrollRepository.save(enroll);
+        post.addEnroll(enroll);
     }
 
     public void cancelJoining(Long postId, Long memberId) {

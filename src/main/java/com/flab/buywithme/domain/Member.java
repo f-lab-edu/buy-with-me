@@ -3,7 +3,6 @@ package com.flab.buywithme.domain;
 import static javax.persistence.FetchType.LAZY;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,15 +37,6 @@ public class Member {
     private String loginId;
 
     private String password;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<Enroll> enrolls;
-
-    @OneToMany(mappedBy = "colleague", cascade = CascadeType.REMOVE)
-    private List<MemberEvaluation> receivedEvaluations;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private List<MemberEvaluation> sentEvaluations;
 
     public Member(Address address, String name, String phoneNo, String loginId,
             String password) {

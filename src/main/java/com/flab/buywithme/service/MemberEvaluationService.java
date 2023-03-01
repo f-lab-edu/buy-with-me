@@ -49,6 +49,8 @@ public class MemberEvaluationService {
 
         memberEvaluationRepository.save(newEvaluation);
 
+        post.addEvaluation(newEvaluation);
+
         return newEvaluation.getId();
     }
 
