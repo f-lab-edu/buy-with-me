@@ -88,6 +88,16 @@ class PostServiceTest {
     }
 
     @Test
+    @DisplayName("전체 게시글 가져오기 성공")
+    public void getAllPostsSuccess() {
+        Pageable pageable = fakePageable();
+
+        postService.getAllPosts(pageable);
+
+        then(postRepository).should().findAll(pageable);
+    }
+
+    @Test
     @DisplayName("키워드 기반 게시글 검색 성공")
     public void searchPostSuccess() {
         Pageable pageable = fakePageable();

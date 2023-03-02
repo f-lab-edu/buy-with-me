@@ -82,7 +82,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("로그인하지 않은 멤버도 게시글 목록 가져오기 요청 성공")
-    public void getPosts() throws Exception {
+    public void getAllPosts() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("size", "2");
         Pageable pageable = fakePageable();
@@ -92,7 +92,24 @@ class PostControllerTest {
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(postService).should().searchPostWithKeyword("", pageable);
+        then(postService).should().getAllPosts(pageable);
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 멤버도 게시글 검색 요청 성공")
+    public void getPostsWithKeyword() throws Exception {
+        String keyword = "test";
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("size", "2");
+        requestParams.add("keyword", keyword);
+        Pageable pageable = fakePageable();
+
+        mockMvc.perform(get("/posts")
+                        .params(requestParams))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(log());
+
+        then(postService).should().searchPostWithKeyword(keyword, pageable);
     }
 
     @Test

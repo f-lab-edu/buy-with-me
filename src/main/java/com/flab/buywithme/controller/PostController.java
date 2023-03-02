@@ -37,8 +37,14 @@ public class PostController {
     }
 
     @GetMapping
+    public Page<Post> getAllPosts(
+            @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
+        return postService.getAllPosts(pageable);
+    }
+
+    @GetMapping(params = "keyword")
     public Page<Post> getPostsWithKeyword(
-            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            @RequestParam String keyword,
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
         return postService.searchPostWithKeyword(keyword, pageable);
     }

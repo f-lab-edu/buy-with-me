@@ -43,6 +43,11 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<Post> searchPostWithKeyword(String keyword, Pageable pageable) {
         return postRepository.findByTitleContainingOrContentContaining(keyword, pageable);
     }
