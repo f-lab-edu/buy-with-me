@@ -5,4 +5,5 @@ TRUNCATE TABLE post;
 TRUNCATE TABLE enroll;
 TRUNCATE TABLE post_comment;
 TRUNCATE TABLE notification;
+TRUNCATE TABLE member_evaluation;
 set FOREIGN_KEY_CHECKS = 1;

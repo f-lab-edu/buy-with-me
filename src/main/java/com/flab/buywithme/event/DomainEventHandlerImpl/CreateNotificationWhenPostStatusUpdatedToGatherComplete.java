@@ -14,20 +14,23 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class CreateNotificationWhenPostStatusUpdatedToComplete implements DomainEventHandler<Post> {
+public class CreateNotificationWhenPostStatusUpdatedToGatherComplete implements
+        DomainEventHandler<Post> {
 
     private final NotificationRepository notificationRepository;
 
     @Override
     public boolean canHandle(DomainEvent<Post> event) {
         return event.getDomainEventType() == DomainEventType.UPDATE_POST
-                && event.getSource().getStatus() == PostStatus.COMPLETE;
+                && event.getSource().getStatus() == PostStatus.GATHER_COMPLETE;
     }
 
     @Override
+    @Transactional
     public void handle(DomainEvent<Post> event) {
         Post post = event.getSource();
 

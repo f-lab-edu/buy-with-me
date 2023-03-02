@@ -2,6 +2,7 @@ package com.flab.buywithme.service;
 
 import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
+import com.flab.buywithme.domain.enums.PostStatus;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
@@ -55,6 +56,15 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<Post> getPostsByAddress(Long addressId, Pageable pageable) {
         return postRepository.findByAddress_Id(addressId, pageable);
+    }
+
+    public void updatePostStatus(Long postId, Long memberId, PostStatus postStatus) {
+        Post post = commonPostService.getPost(postId);
+        checkWhetherAuthor(post, memberId);
+        post.updateStatus(postStatus);
+
+        eventPublisher.publishEvent(
+                new DomainEvent<>(DomainEventType.UPDATE_POST, post));
     }
 
     public void updatePost(Long postId, Long memberId, PostDTO postDTO) {

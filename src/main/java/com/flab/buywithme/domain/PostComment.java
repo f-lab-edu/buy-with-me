@@ -66,4 +66,8 @@ public class PostComment {
     public boolean checkIsOwner(Long memberId) {
         return this.member.getId().equals(memberId);
     }
+
+    public void addChildren(PostComment comment) {
+        children.add(comment);
+    }
 }

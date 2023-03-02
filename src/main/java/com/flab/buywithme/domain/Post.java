@@ -3,6 +3,7 @@ package com.flab.buywithme.domain;
 import com.flab.buywithme.domain.enums.PostStatus;
 import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -62,11 +63,17 @@ public class Post {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<PostComment> comments;
+    private List<PostComment> comments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<Enroll> enrolls;
+    private List<Enroll> enrolls = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<MemberEvaluation> evaluations = new ArrayList<>();
 
     public void update(String title, String content, int targetNo, LocalDateTime expiration) {
         this.title = title;
@@ -82,8 +89,24 @@ public class Post {
     public void increaseCurrentNo() {
         this.currentNo += 1;
         if (this.currentNo == this.targetNo) {
-            this.status = PostStatus.COMPLETE;
+            this.status = PostStatus.GATHER_COMPLETE;
         }
+    }
+
+    public void updateStatus(PostStatus postStatus) {
+        this.status = postStatus;
+    }
+
+    public void addEnroll(Enroll enroll) {
+        enrolls.add(enroll);
+    }
+
+    public void addComment(PostComment comment) {
+        comments.add(comment);
+    }
+
+    public void addEvaluation(MemberEvaluation evaluation) {
+        evaluations.add(evaluation);
     }
 
     @VisibleForTesting

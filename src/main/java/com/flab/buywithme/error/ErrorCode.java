@@ -25,11 +25,13 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(NOT_FOUND, "해당 댓글이 존재하지 않습니다"),
     ENROLL_NOT_FOUND(NOT_FOUND, "등록 정보가 존재하지 않습니다"),
     NOTIFICATION_NOT_FOUND(NOT_FOUND, "해당 알림이 존재하지 않습니다"),
+    EVALUATION_NOT_FOUND(NOT_FOUND, "해당 매너 평가가 존재하지 않습니다"),
 
     /* 409 CONFLICT : 서버의 상태와 충돌하는 경우 */
     MEMBER_ALREADY_EXIST(CONFLICT, "이미 존재하는 회원입니다"),
     GATHERING_FINISHED(CONFLICT, "인원 모집이 마감되었습니다"),
-    ENROLL_ALREADY_DONE(CONFLICT, "이미 구매에 참여했습니다");
+    ENROLL_ALREADY_DONE(CONFLICT, "이미 구매에 참여했습니다"),
+    NOT_ENROLLED_MEMBER(CONFLICT, "해당 구매에 참여하지 않은 멤버입니다");
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -3,9 +3,11 @@ package com.flab.buywithme;
 import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Enroll;
 import com.flab.buywithme.domain.Member;
+import com.flab.buywithme.domain.MemberEvaluation;
 import com.flab.buywithme.domain.Notification;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
+import com.flab.buywithme.dto.MemberEvaluationDTO;
 import com.flab.buywithme.dto.PostCommentDTO;
 import com.flab.buywithme.dto.PostDTO;
 import com.flab.buywithme.event.DomainEventType;
@@ -109,5 +111,23 @@ public class TestFixture {
                 .domainEventType(type)
                 .checked(checked)
                 .build();
+    }
+
+    public static MemberEvaluation fakeMemberEvaluation(Long evaluationId) {
+        Post post = fakePost(defaultPostID);
+        Member member = fakeMember(defaultMemberID);
+        Member colleague = fakeMember(2L);
+
+        return MemberEvaluation.builder()
+                .id(evaluationId)
+                .post(post)
+                .member(member)
+                .colleague(colleague)
+                .content("test eval")
+                .build();
+    }
+
+    public static MemberEvaluationDTO fakeMemberEvaluationDTO() {
+        return new MemberEvaluationDTO("test eval");
     }
 }
