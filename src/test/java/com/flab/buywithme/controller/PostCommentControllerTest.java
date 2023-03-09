@@ -1,6 +1,7 @@
 package com.flab.buywithme.controller;
 
 import static com.flab.buywithme.TestFixture.fakeCommentDTO;
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,9 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
 
 @WebMvcTest(controllers = PostCommentController.class)
 @Import(TestConfig.class)
@@ -95,12 +98,17 @@ class PostCommentControllerTest {
     @Test
     @DisplayName("게시글별 댓글 가져오기 요청 성공")
     public void getAllComment() throws Exception {
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("size", "2");
+        Pageable pageable = fakePageable();
+
         mockMvc.perform(get("/posts/" + postId + "/comments")
-                        .session(mockSession))
+                        .session(mockSession)
+                        .params(requestParams))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(log());
 
-        then(commentService).should().getAllComment(postId);
+        then(commentService).should().getAllComment(postId, pageable);
     }
 
     @Test

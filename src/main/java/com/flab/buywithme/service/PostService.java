@@ -4,6 +4,7 @@ import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.enums.PostStatus;
 import com.flab.buywithme.dto.PostDTO;
+import com.flab.buywithme.dto.PostResponseDto;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.event.DomainEvent;
@@ -11,6 +12,7 @@ import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -44,18 +46,25 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> getAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<PostResponseDto> getAllPosts(Pageable pageable) {
+        return Optional.ofNullable(postRepository.findAll(pageable))
+                .orElseGet(Page::empty)
+                .map(PostResponseDto::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> searchPostWithKeyword(String keyword, Pageable pageable) {
-        return postRepository.findByTitleContainingOrContentContaining(keyword, pageable);
+    public Page<PostResponseDto> searchPostWithKeyword(String keyword, Pageable pageable) {
+        return Optional.ofNullable(
+                        postRepository.findByTitleContainingOrContentContaining(keyword, pageable))
+                .orElseGet(Page::empty)
+                .map(PostResponseDto::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> getPostsByAddress(Long addressId, Pageable pageable) {
-        return postRepository.findByAddress_Id(addressId, pageable);
+    public Page<PostResponseDto> getPostsByAddress(Long addressId, Pageable pageable) {
+        return Optional.ofNullable(postRepository.findByAddress_Id(addressId, pageable))
+                .orElseGet(Page::empty)
+                .map(PostResponseDto::new);
     }
 
     public void updatePostStatus(Long postId, Long memberId, PostStatus postStatus) {

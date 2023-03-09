@@ -3,6 +3,7 @@ package com.flab.buywithme.controller;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.enums.PostStatus;
 import com.flab.buywithme.dto.PostDTO;
+import com.flab.buywithme.dto.PostResponseDto;
 import com.flab.buywithme.service.PostService;
 import com.flab.buywithme.service.common.CommonPostService;
 import com.flab.buywithme.utils.SessionConst;
@@ -39,20 +40,20 @@ public class PostController {
     }
 
     @GetMapping
-    public Page<Post> getAllPosts(
+    public Page<PostResponseDto> getAllPosts(
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
         return postService.getAllPosts(pageable);
     }
 
     @GetMapping(params = "keyword")
-    public Page<Post> getPostsWithKeyword(
+    public Page<PostResponseDto> getPostsWithKeyword(
             @RequestParam String keyword,
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
         return postService.searchPostWithKeyword(keyword, pageable);
     }
 
     @GetMapping("/addresses/{addressId}")
-    public Page<Post> getSameAddressPosts(
+    public Page<PostResponseDto> getSameAddressPosts(
             @PathVariable Long addressId,
             @PageableDefault(sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
         return postService.getPostsByAddress(addressId, pageable);
@@ -60,7 +61,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public Post getPost(@PathVariable Long postId) {
-        return commonPostService.getPost(postId);
+        return commonPostService.getPost(postId); //PostResponseDTO를 반환하도록 수정 예정
     }
 
     @PatchMapping("/{postId}")

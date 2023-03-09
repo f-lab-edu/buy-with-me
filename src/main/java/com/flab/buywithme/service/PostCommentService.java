@@ -4,6 +4,7 @@ import com.flab.buywithme.domain.Member;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.PostComment;
 import com.flab.buywithme.dto.PostCommentDTO;
+import com.flab.buywithme.dto.PostCommentResponseDto;
 import com.flab.buywithme.error.CustomException;
 import com.flab.buywithme.error.ErrorCode;
 import com.flab.buywithme.event.DomainEvent;
@@ -11,9 +12,11 @@ import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostCommentRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
-import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,8 +81,10 @@ public class PostCommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostComment> getAllComment(Long postId) {
-        return commentRepository.findAllByPost_Id(postId);
+    public Page<PostCommentResponseDto> getAllComment(Long postId, Pageable pageable) {
+        return Optional.ofNullable(commentRepository.findAllByPost_Id(postId, pageable))
+                .orElseGet(Page::empty)
+                .map(PostCommentResponseDto::new);
     }
 
     @Transactional(readOnly = true)
