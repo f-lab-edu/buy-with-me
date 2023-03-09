@@ -110,14 +110,14 @@ class PostRepositoryTest {
     @Test
     @DisplayName("게시글 삭제 시 해당 게시글의 댓글과 구매 참여 내역, 멤버 간 평가도 같이 삭제 성공")
     void deletePostWithComment() {
-        assertFalse(postCommentRepository.findAllByPost_Id(postId).isEmpty());
+        assertFalse(postCommentRepository.findAllByPost_Id(postId, pageable).isEmpty());
         assertFalse(enrollRepository.findAllByPost_Id(postId).isEmpty());
         assertFalse(memberEvaluationRepository.findAllByPost_Id(postId).isEmpty());
 
         postRepository.deleteById(postId);
 
         assertTrue(postRepository.findById(postId).isEmpty());
-        assertTrue(postCommentRepository.findAllByPost_Id(postId).isEmpty());
+        assertTrue(postCommentRepository.findAllByPost_Id(postId, pageable).isEmpty());
         assertTrue(enrollRepository.findAllByPost_Id(postId).isEmpty());
         assertTrue(memberEvaluationRepository.findAllByPost_Id(postId).isEmpty());
     }

@@ -3,6 +3,7 @@ package com.flab.buywithme.service;
 import static com.flab.buywithme.TestFixture.fakeComment;
 import static com.flab.buywithme.TestFixture.fakeCommentDTO;
 import static com.flab.buywithme.TestFixture.fakeMember;
+import static com.flab.buywithme.TestFixture.fakePageable;
 import static com.flab.buywithme.TestFixture.fakePost;
 import static com.flab.buywithme.TestFixture.fakeSubComment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,8 +26,6 @@ import com.flab.buywithme.event.DomainEventType;
 import com.flab.buywithme.repository.PostCommentRepository;
 import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class PostCommentServiceTest {
@@ -155,13 +155,9 @@ class PostCommentServiceTest {
     @Test
     @DisplayName("게시글별 댓글 가져오기 성공")
     public void getAllComment() {
-        List<PostComment> comments = Arrays.asList(fakeComment(1L), fakeComment(2L));
-        given(commentRepository.findAllByPost_Id(anyLong()))
-                .willReturn(comments);
-
-        List<PostComment> expectList = Arrays.asList(fakeComment(1L), fakeComment(2L));
-        assertEquals(expectList, commentService.getAllComment(postId));
-        then(commentRepository).should().findAllByPost_Id(postId);
+        Pageable pageable = fakePageable();
+        commentService.getAllComment(postId, pageable);
+        then(commentRepository).should().findAllByPost_Id(postId, pageable);
     }
 
     @Test
