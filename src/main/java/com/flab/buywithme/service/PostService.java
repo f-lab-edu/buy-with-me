@@ -51,7 +51,7 @@ public class PostService {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "postPage", key = "#pageable.pageNumber")
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
-        return Optional.ofNullable(postRepository.findAll(pageable))
+        return Optional.ofNullable(postRepository.findAllUsingFetchJoin(pageable))
                 .orElseGet(Page::empty)
                 .map(PostResponseDto::new);
     }

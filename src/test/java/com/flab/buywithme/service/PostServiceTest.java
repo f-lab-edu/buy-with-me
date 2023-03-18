@@ -95,7 +95,7 @@ class PostServiceTest {
 
         postService.getAllPosts(pageable);
 
-        then(postRepository).should().findAll(pageable);
+        then(postRepository).should().findAllUsingFetchJoin(pageable);
     }
 
     @Test

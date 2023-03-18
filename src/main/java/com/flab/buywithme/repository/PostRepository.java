@@ -21,4 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             Pageable pageable);
 
     Page<Post> findByAddress_Id(Long addressId, Pageable pageable);
+
+    @Query(value = "select distinct p from Post p join fetch p.member join fetch p.address join fetch p.comments",
+            countQuery = "select count(p) from Post p")
+    Page<Post> findAllUsingFetchJoin(Pageable pageable);
 }
