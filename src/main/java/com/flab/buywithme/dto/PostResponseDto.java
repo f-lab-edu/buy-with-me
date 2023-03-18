@@ -1,5 +1,6 @@
 package com.flab.buywithme.dto;
 
+import com.flab.buywithme.domain.Address;
 import com.flab.buywithme.domain.Post;
 import com.flab.buywithme.domain.enums.PostStatus;
 import java.time.LocalDateTime;
@@ -11,8 +12,8 @@ import lombok.Getter;
 public class PostResponseDto {
 
     private Long id;
-    private Long memberId;
-    private Long addressId;
+    private String loginId;
+    private Address address;
     private String title;
     private String content;
     private int targetNo;
@@ -25,8 +26,8 @@ public class PostResponseDto {
     /* Entity -> Dto*/
     public PostResponseDto(Post post) {
         this.id = post.getId();
-        this.memberId = post.getMember().getId();
-        this.addressId = post.getAddress().getId();
+        this.loginId = post.getMember().getLoginId();
+        this.address = post.getAddress();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.targetNo = post.getTargetNo();
