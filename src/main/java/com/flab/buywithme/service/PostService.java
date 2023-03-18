@@ -32,7 +32,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @CacheEvict(cacheNames = "postPage")
+    @CacheEvict(cacheNames = "postPage", allEntries = true)
     public Post savePost(PostDTO postDTO, Long memberId) {
         Member findMember = commonMemberService.getMember(memberId);
 
@@ -73,7 +73,7 @@ public class PostService {
                 .map(PostResponseDto::new);
     }
 
-    @CacheEvict(cacheNames = "postPage")
+    @CacheEvict(cacheNames = "postPage", allEntries = true)
     public void updatePostStatus(Long postId, Long memberId, PostStatus postStatus) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);
@@ -83,7 +83,7 @@ public class PostService {
                 new DomainEvent<>(DomainEventType.UPDATE_POST, post));
     }
 
-    @CacheEvict(cacheNames = "postPage")
+    @CacheEvict(cacheNames = "postPage", allEntries = true)
     public void updatePost(Long postId, Long memberId, PostDTO postDTO) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);
@@ -91,7 +91,7 @@ public class PostService {
                 postDTO.getExpiration());
     }
 
-    @CacheEvict(cacheNames = "postPage")
+    @CacheEvict(cacheNames = "postPage", allEntries = true)
     public void deletePost(Long postId, Long memberId) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);
