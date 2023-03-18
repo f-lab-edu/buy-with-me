@@ -14,6 +14,8 @@ import com.flab.buywithme.service.common.CommonMemberService;
 import com.flab.buywithme.service.common.CommonPostService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +32,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public Long savePost(PostDTO postDTO, Long memberId) {
+    @CacheEvict(cacheNames = "postPage")
+    public Post savePost(PostDTO postDTO, Long memberId) {
         Member findMember = commonMemberService.getMember(memberId);
 
         Post newPost = Post.builder()
@@ -42,10 +45,11 @@ public class PostService {
                 .expiration(postDTO.getExpiration())
                 .build();
 
-        return postRepository.save(newPost).getId();
+        return postRepository.save(newPost);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "postPage", key = "#pageable.pageNumber")
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
         return Optional.ofNullable(postRepository.findAll(pageable))
                 .orElseGet(Page::empty)
@@ -53,6 +57,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "postPage", key = "#keyword + ':' + #pageable.pageNumber")
     public Page<PostResponseDto> searchPostWithKeyword(String keyword, Pageable pageable) {
         return Optional.ofNullable(
                         postRepository.findByTitleContainingOrContentContaining(keyword, pageable))
@@ -61,12 +66,14 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "postPage", key = "#addressId + ':' + #pageable.pageNumber")
     public Page<PostResponseDto> getPostsByAddress(Long addressId, Pageable pageable) {
         return Optional.ofNullable(postRepository.findByAddress_Id(addressId, pageable))
                 .orElseGet(Page::empty)
                 .map(PostResponseDto::new);
     }
 
+    @CacheEvict(cacheNames = "postPage")
     public void updatePostStatus(Long postId, Long memberId, PostStatus postStatus) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);
@@ -76,6 +83,7 @@ public class PostService {
                 new DomainEvent<>(DomainEventType.UPDATE_POST, post));
     }
 
+    @CacheEvict(cacheNames = "postPage")
     public void updatePost(Long postId, Long memberId, PostDTO postDTO) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);
@@ -83,6 +91,7 @@ public class PostService {
                 postDTO.getExpiration());
     }
 
+    @CacheEvict(cacheNames = "postPage")
     public void deletePost(Long postId, Long memberId) {
         Post post = commonPostService.getPost(postId);
         checkWhetherAuthor(post, memberId);

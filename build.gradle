@@ -33,6 +33,8 @@ dependencies {
     implementation "com.google.guava:guava:${springGuavaVersion}"
     implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:${jasyptVersion}"
     implementation "org.apache.commons:commons-collections4:${commonsCollections4Version}"
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
